@@ -4,3 +4,4 @@ The GUI of OPETIA is illustrated in the image bellow.
 ![OPETIA](https://github.com/user-attachments/assets/d711c01f-1faf-49b8-85ac-4b31892b467d)
 
 The pipeline of OPETIA is illustrated in the image bellow.
+![pipeline](https://github.com/user-attachments/assets/d7997e20-9e5d-4655-8736-039365062f7a)
