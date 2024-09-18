@@ -1,5 +1,5 @@
 # OPETIA (Odense-Oxford PET Image Analysis)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/taha-parsayan/OPETIA) 
+![GitHub release (latest by tag)](https://img.shields.io/github/v/tag/taha-parsayan/OPETIA?label=Release)
 
 
 
