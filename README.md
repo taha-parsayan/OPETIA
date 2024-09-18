@@ -28,3 +28,9 @@ Next, the following initializations are required:
 - sudo apt-get install eog
 - module load FSL
 
+### Usage example
+To run OPETIA, firstly create a folder and clone to the OPETIA repository:
+- git clone https://github.com/taha-parsayan/OPETIA.git
+
+Nex, open a terminal in the OPETIA folder and run the following command:
+- python2 OPETIA.py
