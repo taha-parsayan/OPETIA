@@ -18,14 +18,13 @@ The pipeline of OPETIA is illustrated in the image bellow.
 
 ## How to use
 ### initializations
-OPETIA is running on Linux-based systems. First and foremost, the FSL needs to be installed using the following link.
+OPETIA is running on Linux-based systems. First and foremost, the FSL needs to be installed using the following link:
 [FSL installation](https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/FslInstallation.html)
 
-Next, the following initializations are required.
-- Python 2
-- Python 3
->sudo apt-get update
->sudo apt-get install python-tk
->sudo apt-get install eog
->module load FSL
+Next, the following initializations are required:
+- sudo apt-get update
+- sudo apt install python2
+- sudo apt-get install python-tk
+- sudo apt-get install eog
+- module load FSL
 
