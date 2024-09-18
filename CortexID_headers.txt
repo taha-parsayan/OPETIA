@@ -1,1 +1,0 @@
-Number Area_name SUV_min SUV_max SUV_mean SUV_sd SUVR_min SUVR_max SUVR_mean SUVR_sd Volume
