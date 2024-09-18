@@ -1,0 +1,1 @@
+Number Area_name SUV_cortical_min SUV_cortical_max SUV_cortical_mean SUV_cortical_sd SUVR_cortical_min SUVR_cortical_max SUVR_cortical_mean SUVR_cortical_sd Cortical_volume
