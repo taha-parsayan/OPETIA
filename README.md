@@ -35,5 +35,5 @@ To run OPETIA, firstly create a folder and clone to the OPETIA repository:
 Nex, open a terminal in the OPETIA folder and run the following command:
 - python2 OPETIA.py
 
-# Author Contributions
+## Author Contributions
 Mohammadtaha Parsayan: Software, Validation, Formal analysis, Investigation, Data Curation, Writing - Original Draft; Sasan Andalib: Writing - Review & Editing, Validation; Thomas Lund Andersen; Writing - Review & Editing, Methodology; Habib Ganjgahi; Writing -Review & Editing, Methodology; Poul Flemming Høilund-Carlsen; Writing - Review & Editing, Validation; Abass Alavi: Writing - Review & Editing, Validation; Mojtaba Zarei: Methodology, Conceptualization, Funding acquisition, Project administration, Validation, Writing - Review & Editing.
