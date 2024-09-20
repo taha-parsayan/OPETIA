@@ -33,7 +33,7 @@ Next, the following initializations are required:
 - sudo apt install python2
 - sudo apt-get install python-tk
 - sudo apt-get install eog
-- module load FSL
+- module load FSL (for cloud-based servers, if necessary)
 
 ### Usage example
 To run OPETIA, firstly create a folder and clone to the OPETIA repository:
