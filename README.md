@@ -11,7 +11,7 @@ OPETIA is a user-friendly PET/MRI (Positron Emission Tomography / Magnetic Reson
 
 The inputs of OPETIA include MRI T1-weighted, static PET, and subject's information (body weight, height, total injected dose of the radiotracer).
 The outputs of OPETIA include SUV & SUVR (min, mean, max, sd) and cortical volume (mean) of the regions of interest (ROI).
-The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain stem) ROIs have been selected as the default brain atlas for OPETIA. We have devided the regions into left and right hemispheres, resulting in 96 cortical nad 19 subcortical ROIs.
+The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain stem) ROIs have been selected as the default brain atlas for OPETIA. We have devided the regions into left and right hemispheres, resulting in 96 cortical and 19 subcortical ROIs.
 
 
 
