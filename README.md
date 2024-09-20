@@ -42,5 +42,3 @@ To run OPETIA, firstly create a folder and clone to the OPETIA repository:
 Next, open a terminal in the OPETIA folder and run the following command:
 - python2 OPETIA.py
 
-## Author Contributions
-Mohammadtaha Parsayan: Software, Validation, Formal analysis, Investigation, Data Curation, Writing paper - Original Draft; Sasan Andalib: Writing paper - Review & Editing, Validation; Thomas Lund Andersen; Writing paper - Review & Editing, Methodology; Habib Ganjgahi; Writing paper -Review & Editing, Methodology; Poul Flemming Høilund-Carlsen; Writing paper - Review & Editing, Validation; Abass Alavi: Writing paper - Review & Editing, Validation; Mojtaba Zarei: Methodology, Conceptualization, Funding acquisition, Project administration, Validation, Writing paper - Review & Editing.
