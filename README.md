@@ -45,5 +45,6 @@ Next, open a terminal in the OPETIA folder and run the following command:
 ## Citation
 
 If you use this tool in your work, please cite it as:
+
 Mohammadtaha Parsayan, Sasan Andalib, Thomas Lund Andersen, Habib Ganjgahi, Poul Flemming Høilund-Carlsen, Abass Alavi, Mojtaba Zarei. Odense-Oxford PET/MR Image Analysis (OPETIA) of the brain: a user-friendly toolbox. Version 2024-09. [cited (date)]. Available at: https://github.com.mcas.ms/taha-parsayan/OPETIA.
 
