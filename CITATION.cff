@@ -4,7 +4,7 @@ title: "OPETIA"
 authors:
   - family-names: "Parsayan"
     given-names: "Mohammadtaha"
-    orcid: "0000-0000-0000-0000"
+    #orcid: "0000-0000-0000-0000"
 date-released: 2024-09-01
 version: "v2024-09"
 #doi: "10.xxxx/your-doi" 
