@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "OPETIA"
+authors:
+  - family-names: "Parsayan"
+    given-names: "Mohammadtaha"
+    orcid: "0000-0000-0000-0000"
+date-released: 2024-09-01
+version: "v2024-09"
+#doi: "10.xxxx/your-doi" 
+url: "https://github.com/taha-parsayan/OPETIA"
+repository-code: "https://github.com/taha-parsayan/OPETIA"
+keywords: 
+  - OPETIA
+  - FSL
+  - Neuroimaging
+license: FSL  # Or whichever license you choose
