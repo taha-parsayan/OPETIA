@@ -23,7 +23,7 @@ OPETIA contains the following tools:
 
 The GUI of OPETIA is illustrated in the image below.
 
-![GUI-figures](https://github.com/user-attachments/assets/d16fe3fa-1474-4f94-acdc-9da5bd1e64b1)
+![GUI-figures](https://github.com/user-attachments/assets/e10b4fee-aeed-46f0-bb96-8a548b8c864f)
 
 The pipeline of OPETIA is illustrated in the image below.
 
