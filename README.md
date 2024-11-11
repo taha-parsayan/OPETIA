@@ -17,7 +17,7 @@ The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain st
 
 The GUI of OPETIA is illustrated in the image below.
 
-![OPETIA](https://github.com/user-attachments/assets/d711c01f-1faf-49b8-85ac-4b31892b467d)
+![GUI-figures](https://github.com/user-attachments/assets/d16fe3fa-1474-4f94-acdc-9da5bd1e64b1)
 
 The pipeline of OPETIA is illustrated in the image below.
 
