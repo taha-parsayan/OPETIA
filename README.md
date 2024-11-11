@@ -13,7 +13,13 @@ The inputs of OPETIA include MRI T1-weighted, static PET, and the subject's info
 The outputs of OPETIA include SUV & SUVR (min, mean, max, sd) and cortical volume (mean) of the regions of interest (ROI).
 The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain stem) ROIs have been selected as the default brain atlas for OPETIA. We have divided the regions into left and right hemispheres, resulting in 96 cortical and 19 subcortical ROIs.
 
-
+## Tools
+OPETIA contains the following tools:
+- MRIcroGL: for converting DICOM images to nifti images, and also for visualization.
+- NIFTI organizer: To copy all nifti images to their corresponding subject folders, and rename them to PET.nii and T1.nii
+- Structural image pre-processing
+- PET image pre-processing
+- ROI analysis: to calculate SUV, SUVR, and cortical volume for 115 ROIs
 
 The GUI of OPETIA is illustrated in the image below.
 
@@ -30,7 +36,7 @@ OPETIA is running on Linux-based systems. First and foremost, the FSL needs to b
 
 Next, download MRIcroGL_Linux from:
 [MRIcroGL](https://www.nitrc.org/frs/?group_id=889)
-Copy the file into OPETIA folder and unzip it.
+Copy the file into the OPETIA folder and unzip it.
 
 Next, the following initializations are required:
 - sudo apt-get update
