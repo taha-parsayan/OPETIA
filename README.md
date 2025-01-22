@@ -29,6 +29,10 @@ The pipeline of OPETIA is illustrated in the image below.
 
 ![pipeline](https://github.com/user-attachments/assets/d7997e20-9e5d-4655-8736-039365062f7a)
 
+Statistical analysis showed a perfect alignment between the results of OPETIA and SPM12.
+
+![Image](https://github.com/user-attachments/assets/0f97c218-9d2d-4260-9d25-7b3e1621a1ae)
+
 ## How to use
 ### initializations
 OPETIA is running on Linux-based systems. First and foremost, the FSL needs to be installed using the following link:
