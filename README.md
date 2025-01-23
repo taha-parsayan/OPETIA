@@ -1,6 +1,7 @@
 # OPETIA (Odense-Oxford PET Image Analysis)
 ![GitHub release (latest by tag)](https://img.shields.io/github/v/tag/taha-parsayan/OPETIA?label=Release)
 ![Static Badge](https://img.shields.io/badge/Neuroimaging%20software-FF0000)
+![Static Badge](https://img.shields.io/badge/Data%20Science-32CD32)
 ![Static Badge](https://img.shields.io/badge/Python-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/FSL-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/PET%20/%20MRI-4CAF50)
