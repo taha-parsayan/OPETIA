@@ -37,7 +37,7 @@ Statistical analysis showed a perfect alignment between the results of OPETIA an
 ![Image](https://github.com/user-attachments/assets/852dbe5a-3b8b-4829-8c18-c3b2fc4179e1)
 
 ## How to use
-### initializations
+### Initializations
 OPETIA is running on Linux-based systems. First and foremost, the FSL needs to be installed using the following link:
 [FSL installation](https://web.mit.edu/fsl_v5.0.10/fsl/doc/wiki/FslInstallation.html)
 
