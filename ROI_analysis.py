@@ -1,50 +1,38 @@
-from Tkinter import *
+from tkinter import *
 import os
-import ttk
-import tkFileDialog
-from tkFileDialog import askopenfile
-import tkMessageBox as messagebox
+from tkinter import ttk
+import tkinter.filedialog as tkFileDialog
+from tkinter import messagebox
 import myfunctions
 import webbrowser
 import time
 import threading
 import subprocess
-import commands
 import shutil
 
 
 root = Tk()
 root.geometry("500x395+950+250")
 root.resizable(False, False)
-root. title("ROI analysis")
+root.title("ROI analysis")
 
 
 #___Variables
-var_pet_address_input = StringVar()
-var_pet_address_input.set('Not defined...')
-var_pet_address_output = StringVar()
-var_pet_address_output.set('Not defined...')
-var_injected_dose = StringVar()
-var_injected_dose.set('100000000')
-var_body_weight = StringVar()
-var_body_weight.set('80')
-var_type_of_measurement = StringVar()
-var_type_of_measurement.set('Using body weight')
-var_type_of_SUV = StringVar()
-var_type_of_SUV.set('SUV mean')
-var_height = StringVar()
-var_height.set('1.8')
-var_SUV_reference = StringVar()
-var_SUV_reference.set('Cerebellum')
-var_atlas = StringVar()
-var_atlas.set('Harvard Oxford atlas')
+var_pet_address_input = StringVar(value='Not defined...')
+var_pet_address_output = StringVar(value='Not defined...')
+var_injected_dose = StringVar(value='1')
+var_body_weight = StringVar(value='80')
+var_type_of_measurement = StringVar(value='Using body weight')
+var_type_of_SUV = StringVar(value='SUV mean')
+var_height = StringVar(value='1.8')
+var_SUV_reference = StringVar(value='Cerebellum')
+var_atlas = StringVar(value='Harvard Oxford atlas')
 
 #___commands
 def btn_enter_pet_input_command():
     path = myfunctions.get_address_folder()
     var_pet_address_input.set(path)
     var_pet_address_output.set(var_pet_address_input.get() + '/ROI_analysis')
-
 
 def btn_enter_pet_output_command():
     path = myfunctions.get_address_folder()
@@ -168,16 +156,16 @@ def btn_process_command():
             os.system('fslmaths ' + var_pet_address_input.get() + '/PET_brain_std.nii.gz -mul ' + var_pet_address_input.get() + \
              '/temp_img.nii.gz ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz ')
 
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -M')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -M')
             L = len(x1)
             var_RA_refrence_mean = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -P 0')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -P 0')
             L = len(x1)
             var_RA_refrence_min = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -P 100')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -P 100')
             L = len(x1)
             var_RA_refrence_max = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -S')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebellum.nii.gz -S')
             L = len(x1)
             var_RA_reference_sd = x1[0:L-1]
 
@@ -189,37 +177,37 @@ def btn_process_command():
             os.system('fslmaths ' + var_pet_address_input.get() + '/PET_brain_std.nii.gz -mul ' + var_pet_address_input.get() + \
              '/temp_img.nii.gz ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz ')
 
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -M')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -M')
             L = len(x1)
             var_RA_refrence_mean = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -P 0')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -P 0')
             L = len(x1)
             var_RA_refrence_min = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -P 100')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -P 100')
             L = len(x1)
             var_RA_refrence_max = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -S')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Cerebral_cortex.nii.gz -S')
             L = len(x1)
             var_RA_reference_sd = x1[0:L-1]
 
         elif var_SUV_reference.get() == 'Pons':
             os.system('fslmaths ' + var_pet_address_input.get() + '/PET_brain_std.nii.gz' + ' -mul atlas_cortical/Pons.nii.gz ' + \
-            var_pet_address_input.get() + '/PET_Pons.nii.gz.nii.gz')
+            var_pet_address_input.get() + '/PET_Pons.nii.gz')
             # os.system('fslmaths ' + var_pet_address_output.get() + '/temp_img.nii.gz -bin ' + var_pet_address_output.get() + \
             #  '/temp_img.nii.gz')
             # os.system('fslmaths ' + var_pet_address_input.get() + '/PET_brain_std.nii.gz -mul ' + var_pet_address_output.get() + \
             #  '/temp_img.nii.gz ' + var_pet_address_output.get() + '/PET_Pons.nii.gz ')
 
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -M')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -M')
             L = len(x1)
             var_RA_refrence_mean = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -P 0')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -P 0')
             L = len(x1)
             var_RA_refrence_min = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -P 100')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -P 100')
             L = len(x1)
             var_RA_refrence_max = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -S')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_Pons.nii.gz -S')
             L = len(x1)
             var_RA_reference_sd = x1[0:L-1]
 
@@ -231,16 +219,16 @@ def btn_process_command():
             # os.system('fslmaths ' + var_pet_address_input.get() + '/PET_brain_std.nii.gz -mul ' + var_pet_address_output.get() + \
             #  '/temp_img.nii.gz ' + var_pet_address_output.get() + '/PET_global.nii.gz ')
 
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -M')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -M')
             L = len(x1)
             var_RA_refrence_mean = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -P 0')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -P 0')
             L = len(x1)
             var_RA_refrence_min = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -P 100')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -P 100')
             L = len(x1)
             var_RA_refrence_max = x1[0:L-1]
-            status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -S')
+            status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_input.get() + '/PET_global.nii.gz -S')
             L = len(x1)
             var_RA_reference_sd = x1[0:L-1]
 
@@ -292,23 +280,23 @@ def btn_process_command():
                  ' ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz')
 
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -M')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -M')
                 L = len(x1)
                 var_SUV_cortical_mean = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -P 0')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -P 0')
                 L = len(x1)
                 var_SUV_cortical_min = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -P 100')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -P 100')
                 L = len(x1)
                 var_SUV_cortical_max = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -S')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -S')
                 L = len(x1)
                 var_SUV_cortical_sd = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -V')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_images/' + str(i) + '.nii.gz -V')
                 L = len(x1)
                 x2 = x1[0:L-1]
                 var_ROI_cortical_volume = x2.rsplit(' ', 1)[1]
@@ -356,23 +344,23 @@ def btn_process_command():
                 os.system('fslmaths ' + var_pet_address_output.get() + '/Cortical_normalized_images/temp_img.nii.gz -mul ' + str(coefficient) + \
                  ' ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz')
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -M')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -M')
                 L = len(x1)
                 var_SUVR_cortical_mean = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -P 0')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -P 0')
                 L = len(x1)
                 var_SUVR_cortical_min = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -P 100')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -P 100')
                 L = len(x1)
                 var_SUVR_cortical_max = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -S')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -S')
                 L = len(x1)
                 var_SUVR_cortical_sd = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -V')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Cortical_normalized_images/' + str(i) + '.nii.gz -V')
                 L = len(x1)
                 x2 = x1[0:L-1]
                 var_ROI_cortical_volume = x2.rsplit(' ', 1)[1]
@@ -464,23 +452,23 @@ def btn_process_command():
                  ' ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz')
 
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -M')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -M')
                 L = len(x1)
                 var_SUV_subcortical_mean = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -P 0')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -P 0')
                 L = len(x1)
                 var_SUV_subcortical_min = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -P 100')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -P 100')
                 L = len(x1)
                 var_SUV_subcortical_max = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -S')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -S')
                 L = len(x1)
                 var_SUV_subcortical_sd = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -V')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_images/' + str(i) + '.nii.gz -V')
                 L = len(x1)
                 x2 = x1[0:L-1]
                 var_ROI_subcortical_volume = x2.rsplit(' ', 1)[1]
@@ -536,23 +524,23 @@ def btn_process_command():
                  ' ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz')
 
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -M')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -M')
                 L = len(x1)
                 var_SUVR_subcortical_mean = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -P 0')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -P 0')
                 L = len(x1)
                 var_SUVR_subcortical_min = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -P 100')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -P 100')
                 L = len(x1)
                 var_SUVR_subcortical_max = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -S')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -S')
                 L = len(x1)
                 var_SUVR_subcortical_sd = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -V')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/Subcortical_normalized_images/' + str(i) + '.nii.gz -V')
                 L = len(x1)
                 x2 = x1[0:L-1]
                 var_ROI_subcortical_volume = x2.rsplit(' ', 1)[1]
@@ -663,23 +651,23 @@ def btn_process_command():
                  ' ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz')
 
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -M')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -M')
                 L = len(x1)
                 var_SUV_cortical_mean = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -P 0')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -P 0')
                 L = len(x1)
                 var_SUV_cortical_min = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -P 100')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -P 100')
                 L = len(x1)
                 var_SUV_cortical_max = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -S')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -S')
                 L = len(x1)
                 var_SUV_cortical_sd = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -V')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/images/' + str(i) + '.nii.gz -V')
                 L = len(x1)
                 x2 = x1[0:L-1]
                 var_ROI_cortical_volume = x2.rsplit(' ', 1)[1]
@@ -732,19 +720,19 @@ def btn_process_command():
                  ' ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz')
 
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -M')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -M')
                 L = len(x1)
                 var_SUVR_cortical_mean = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -P 0')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -P 0')
                 L = len(x1)
                 var_SUVR_cortical_min = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -P 100')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -P 100')
                 L = len(x1)
                 var_SUVR_cortical_max = x1[0:L-1]
 
-                status, x1 = commands.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -S')
+                status, x1 = subprocess.getstatusoutput('fslstats ' + var_pet_address_output.get() + '/normalized_images/' + str(i) + '.nii.gz -S')
                 L = len(x1)
                 var_SUVR_cortical_sd = x1[0:L-1]
 
@@ -816,41 +804,36 @@ def btn_process_command():
 
 
 #___GUI
-frame1 = LabelFrame(root, text = 'Input parameters')
-frame1.config(relief=SUNKEN, bd=2)
+frame1 = LabelFrame(root, text='Input parameters', relief=SUNKEN, bd=2)
 frame1.place(x=5, y=5, width=490, height=315)
 
-label1 = Label(frame1, text = "Folder including pre-processed data (OPETIA_output):").place(x=5,y=5)
-btn_enter_pet_input = Button(frame1, text = "Browse", command = btn_enter_pet_input_command).place(x=5, y=30)
-entr_address_structural_input = Entry(frame1, textvariable = var_pet_address_input).place(x=100, y=35, width=365)
+Label(frame1, text="Folder including pre-processed data (OPETIA_output):").place(x=5, y=5)
+Button(frame1, text="Browse", command=btn_enter_pet_input_command).place(x=5, y=30)
+Entry(frame1, textvariable=var_pet_address_input).place(x=100, y=35, width=365)
 
-label2 = Label(frame1, text = "Output folder (name it ROI_analysis):").place(x=5, y=70)
-btn_enter_pet_output = Button(frame1, text="Browse", command = btn_enter_pet_output_command).place(x=5, y=95)
-entr_address_pet_output = Entry(frame1, textvariable = var_pet_address_output).place(x=100, y=100, width=365)
+Label(frame1, text="Output folder (name it ROI_analysis):").place(x=5, y=70)
+Button(frame1, text="Browse", command=btn_enter_pet_output_command).place(x=5, y=95)
+Entry(frame1, textvariable=var_pet_address_output).place(x=100, y=100, width=365)
 
-label3 = Label(frame1, text = "Tracer radioactivity (Bq):").place(x=5,y=140)
-entr_injected_dose = Entry(frame1, textvariable = var_injected_dose).place(x=365,y=140, width=100)
+Label(frame1, text="Tracer radioactivity (Bq):").place(x=5, y=140)
+Entry(frame1, textvariable=var_injected_dose).place(x=365, y=140, width=100)
 
-label4 = Label(frame1, text = "Body weight (kg):").place(x=5,y=165)
-entr_injected_dose = Entry(frame1, textvariable = var_body_weight).place(x=365,y=165, width=100)
+Label(frame1, text="Body weight (kg):").place(x=5, y=165)
+Entry(frame1, textvariable=var_body_weight).place(x=365, y=165, width=100)
 
-label5 = Label(frame1, text = "Body height (m):").place(x=5, y=190)
-entrBMI = Entry(frame1, textvariable = var_height).place(x=365,y=190, width=100)
+Label(frame1, text="Body height (m):").place(x=5, y=190)
+Entry(frame1, textvariable=var_height).place(x=365, y=190, width=100)
 
-label6 = Label(frame1, text='Type of measurement:').place(x=5,y=215)
-combo_type_of_measurement = ttk.Combobox(frame1, textvariable=var_type_of_measurement, values = ('Using body weight', 'Using LBM (male)', 'Using LBM (female)'),
- state= 'readonly').place(x=265, y=220, width=200)
+Label(frame1, text='Type of measurement:').place(x=5, y=215)
+ttk.Combobox(frame1, textvariable=var_type_of_measurement, values=['Using body weight', 'Using LBM (male)', 'Using LBM (female)'], state='readonly').place(x=265, y=220, width=200)
 
-label7 = Label(frame1, text='SUV reference:').place(x=5,y=240)
-combo_type_of_measurement = ttk.Combobox(frame1, textvariable=var_SUV_reference, values = ('Cerebellum', 'Cerebral cortex', 'Pons', 'Global gray matter'),
-state= 'readonly').place(x=265, y=245, width=200)
+Label(frame1, text='SUV reference:').place(x=5, y=240)
+ttk.Combobox(frame1, textvariable=var_SUV_reference, values=['Cerebellum', 'Cerebral cortex', 'Pons', 'Global gray matter'], state='readonly').place(x=265, y=245, width=200)
 
-label8 = Label(frame1, text='Brain atlas:').place(x=5,y=265)
-combo_type_of_measurement = ttk.Combobox(frame1, textvariable=var_atlas, values = ('Harvard Oxford atlas', 'CortexID Suite atlas'),
-state= 'readonly').place(x=265, y=270, width=200)
+Label(frame1, text='Brain atlas:').place(x=5, y=265)
+ttk.Combobox(frame1, textvariable=var_atlas, values=['Harvard Oxford atlas', 'CortexID Suite atlas'], state='readonly').place(x=265, y=270, width=200)
 
-
-btn_process = Button(root, text="Start processing", command = btn_process_command).place(x=5, y=360)
-btn_open_folder = Button(root, text="Open output folder", command = btn_open_folder_command).place(x=145,y=360)
+Button(root, text="Process", command=btn_process_command).place(x=5, y=325, width = 490)
+Button(root, text="Open output folder", command=btn_open_folder_command).place(x=5, y=360, width = 490)
 
 root.mainloop()
