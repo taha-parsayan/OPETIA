@@ -20,8 +20,8 @@ The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain st
 OPETIA contains the following tools:
 - MRIcroGL: for converting DICOM images to nifty images, and also for visualization.
 - NIFTI organizer: For automatic data management. To copy all nifty images to their corresponding subject folders, and rename them to PET.nii and T1.nii
-- Structural image analysis
-- PET image analysis
+- Structural (MRI) image analysis
+- Functional (PET) image analysis
 - ROI analysis: to calculate SUV, SUVR, and cortical volume for 115 ROIs
 
 The GUI of OPETIA is illustrated in the image below.
