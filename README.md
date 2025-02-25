@@ -47,15 +47,15 @@ Copy the file into the OPETIA folder and unzip it.
 
 Next, the following initializations are required:
 - sudo apt-get update
-- sudo apt install python2
+- sudo apt install python3.8
 - sudo apt-get install python-tk
 - sudo apt-get install eog
 - module load FSL (for cloud-based servers, if necessary)
 
 ### Usage example
-To run OPETIA, firstly create a folder and clone to the OPETIA repository:
+To run OPETIA, create a folder and clone it to the OPETIA repository:
 - git clone https://github.com/taha-parsayan/OPETIA.git
 
 Next, open a terminal in the OPETIA folder and run the following command:
-- python2 OPETIA.py
+- python3.8 OPETIA.py
 
