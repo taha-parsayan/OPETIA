@@ -1,9 +1,9 @@
-from Tkinter import *
+from tkinter import *
 import os
-import ttk
-import tkFileDialog
-from tkFileDialog import askopenfile
-import tkMessageBox as messagebox
+import tkinter.ttk as ttk
+import tkinter.filedialog as tkFileDialog
+from tkinter.filedialog import askopenfile
+import tkinter.messagebox as messagebox
 import myfunctions
 import webbrowser
 import time
@@ -11,9 +11,9 @@ import threading
 
 
 root = Tk()
-root.geometry("500x545+950+250")
+root.geometry("500x580+950+250")
 root.resizable(False, False)
-root. title("Structural image pre-processing")
+root.title("Structural image pre-processing")
 
 #___Variables
 var_structural_address_input = StringVar()
@@ -41,11 +41,10 @@ def btn_enter_structural_input_command():
     path = myfunctions.get_address_file()
     var_structural_address_input.set(path)
     (dirname, filename) = os.path.split(var_structural_address_input.get())
-    os.system('mkdir ' + dirname + '/OPETIA_output')
+    os.makedirs(dirname + '/OPETIA_output', exist_ok=True)
     var_structural_address_output.set(dirname + '/OPETIA_output')
 
 def btn_show_image_command():
-    #os.system("fsleyes " + var_structural_address_input.get())
     img1 = var_structural_address_output.get() + '/structural_brain_std.nii.gz'
     img2 = '/opt/easybuild/software/FSL/6.0.3-foss-2019b-Python-3.7.4/fsl/data/standard/MNI152lin_T1_2mm_brain.nii.gz'
     img3 = var_structural_address_output.get() + '/structural_quality_control.png'
@@ -189,16 +188,17 @@ combo_reg_dof = ttk.Combobox(frame3, textvariable=var_reg_dof, values = ('Transl
 label9 = Label(frame3, text="Cost function:").place(x=5,y=100)
 combo_reg_cost = ttk.Combobox(frame3, textvariable=var_reg_cost, values = ('Correlation ratio', 'Mutual information', 'Normalised mutual information',
 'Normalised correlation', 'Least squares'), state= 'readonly').place(x=265, y=100, width=200)
-label10 = Label(frame3, text="Interpolation:").place(x=5,y=125)
-combo_reg_interp = ttk.Combobox(frame3, textvariable=var_reg_interp, values = ('Tri-linear', 'Nearest neighbour', 'Spline',
-'Sinc'), state= 'readonly').place(x=265, y=125, width=200)
 
-#FAST_chechbtn = Checkbutton(frame4, text='FAST (GM,WM,CSF segmentation)', variable = var_FAST_chechbtn).place(x=5,y=5)
+label10 = Label(frame3, text="Interpolation:").place(x=5, y=125)
+combo_reg_interp = ttk.Combobox(frame3, textvariable=var_reg_interp, values = ('Nearest neighbour', 'Tri-linear', 'Spline', 'Lanczos'), state = 'readonly').place(x=265, y=125, width=200)
 
+# label11 = Checkbutton(frame4, text = "Run FAST segmentation", variable = var_FAST_chechbtn).place(x=5, y=5)
 
-btn_process = Button(root, text="Start processing", command = btn_process_command).place(x=5, y=510)
-btn_show_image_1 = Button(root, text="Show image", command=btn_show_image_command).place(x=145,y=510)
-btn_open_folder = Button(root, text="Open output folder", command = btn_open_folder_command).place(x=260,y=510)
+btn_process = Button(root, text = "Process", command = btn_process_command).place(x=5, y=475, width=490)
+                     
+btn_show_image = Button(root, text = "Show processed image", command = btn_show_image_command).place(x=5, y=510, width=490)
+
+btn_open_folder = Button(root, text="Open output folder", command = btn_open_folder_command).place(x=5, y=545, width=490)
 
 
 root.mainloop()
