@@ -17,16 +17,16 @@ def btn_mricrogl_command():
     subprocess.run(['./MRIcroGL/MRIcroGL'], shell = True, check = True) 
     
 def btn_nifti_organizer_command():
-    os.system('python3.8 NIFTI_organizer.py')
+    os.system('python3 NIFTI_organizer.py')
     
 def btn_stage1_command():
-    os.system('python3.8 structural_process.py')
+    os.system('python3 structural_process.py')
 
 def btn_stage2_command():
-    os.system('python3.8 pet_process.py')
+    os.system('python3 pet_process.py')
 
 def btn_stage3_command():
-    os.system('python3.8 ROI_analysis.py')
+    os.system('python3 ROI_analysis.py')
 
 # ___GUI
 frame1 = Frame(root, relief=SUNKEN, bd=2)
