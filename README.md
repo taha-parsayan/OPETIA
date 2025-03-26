@@ -57,5 +57,5 @@ To run OPETIA, create a folder and clone it to the OPETIA repository:
 - git clone https://github.com/taha-parsayan/OPETIA.git
 
 Next, open a terminal in the OPETIA folder and run the following command:
-- python3.8 OPETIA.py
+- python3 OPETIA.py
 
