@@ -47,8 +47,8 @@ Copy the file into the OPETIA folder and unzip it.
 
 Next, the following initializations are required:
 - sudo apt-get update
-- sudo apt install python3.8
-- sudo apt-get install python-tk
+- sudo apt install python3
+- sudo apt-get install python3-tk
 - sudo apt-get install eog
 - module load FSL (for cloud-based servers, if necessary)
 
