@@ -8,7 +8,7 @@ import threading
 import subprocess
 
 root = Tk()
-root.geometry("245x445+500+250")
+root.geometry("245x445+0+0")
 root.resizable(False, False)
 root.title("OPETIA")
 
