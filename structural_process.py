@@ -11,7 +11,7 @@ import threading
 
 
 root = Tk()
-root.geometry("500x580+950+250")
+root.geometry("500x580+0+0")
 root.resizable(False, False)
 root.title("Structural image pre-processing")
 
