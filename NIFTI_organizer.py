@@ -11,7 +11,7 @@ import fnmatch
 import sys
 
 root = Tk()
-root.geometry("500x195+950+250")
+root.geometry("500x195+0+0")
 root.resizable(False, False)
 root.title("NIFTI organizer")
 

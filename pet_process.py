@@ -7,7 +7,7 @@ import time
 import threading
 
 root = tk.Tk()
-root.geometry("500x755+950+250")
+root.geometry("500x755+0+0")
 root.resizable(False, False)
 root.title("PET image pre-processing")
 

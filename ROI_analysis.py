@@ -12,7 +12,7 @@ import shutil
 
 
 root = Tk()
-root.geometry("500x395+950+250")
+root.geometry("500x395+0+0")
 root.resizable(False, False)
 root.title("ROI analysis")
 
