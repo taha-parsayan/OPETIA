@@ -46,11 +46,18 @@ Next, download MRIcroGL_Linux from:
 Copy the file into the OPETIA folder and unzip it.
 
 Next, the following initializations are required:
+Ubuntu users:
 - sudo apt-get update
 - sudo apt install python3
 - sudo apt-get install python3-tk
 - sudo apt-get install eog
 - module load FSL (for cloud-based servers, if necessary)
+
+MacOS users:
+- brew update
+- brew install python@3.12
+- brew install python-tk@3.12
+(eog is not supported in MacOS)
 
 ### Usage example
 To run OPETIA, create a folder and clone it to the OPETIA repository:
