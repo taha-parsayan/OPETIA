@@ -66,3 +66,6 @@ To run OPETIA, create a folder and clone it to the OPETIA repository:
 Next, open a terminal in the OPETIA folder and run the following command:
 - python3 OPETIA.py
 
+## Citation
+Please cite the following paper:
+https://www.sciencedirect.com/science/article/pii/S1053811925002812
