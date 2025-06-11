@@ -141,9 +141,9 @@ def btn_process_command():
 
 def btn_open_folder_command():
     if is_mac():
-            subprocess.call(["open", var_address_input.get()])
+            subprocess.call(["open", var_structural_address_input.get()])
     elif is_linux():
-            subprocess.call(["xdg-open", var_address_input()])
+            subprocess.call(["xdg-open", var_structural_address_input()])
 
 def is_mac():
     return platform.system() == 'Darwin'
