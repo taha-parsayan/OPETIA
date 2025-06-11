@@ -17,8 +17,9 @@ root.resizable(False, False)
 root.title("Structural image pre-processing")
 
 #___Variables
+var_file_address_input = StringVar()
+var_file_address_input.set("Not defined...")
 var_structural_address_input = StringVar()
-var_structural_address_input.set("Not defined...")
 var_structural_address_output = StringVar()
 var_structural_address_output.set("Not defined...")
 var_BET_threshold = StringVar()
@@ -50,8 +51,9 @@ elif is_mac():
 
 #___Commands
 def btn_enter_structural_input_command():
-    path = myfunctions.get_address_file()
-    var_structural_address_input.set(path)
+    path = myfunctions.get_address_folder()
+    var_file_address_input.set(path)
+    var_structural_address_input.set(path + '/T1.nii.gz')
     (dirname, filename) = os.path.split(var_structural_address_input.get())
     os.makedirs(dirname + '/OPETIA_output', exist_ok=True)
     var_structural_address_output.set(dirname + '/OPETIA_output')
@@ -156,9 +158,9 @@ def btn_process_command():
 
 def btn_open_folder_command():
     if is_mac():
-            subprocess.call(["open", var_structural_address_input.get()])
+            subprocess.call(["open", var_file_address_input.get()])
     elif is_linux():
-            subprocess.call(["xdg-open", var_structural_address_input()])
+            subprocess.call(["xdg-open", var_file_address_input()])
 
 def is_mac():
     return platform.system() == 'Darwin'
@@ -181,15 +183,15 @@ frame2.place(x=5, y=170, width=490, height=110)
 
 frame3 = LabelFrame(root, text = 'Registration (native structural space to standard space)')
 frame3.config(relief=SUNKEN, bd=2)
-frame3.place(x=5, y=295, width=490, height=170)
+frame3.place(x=5, y=295, width=490, height=175)
 
 # frame4 = LabelFrame(root, text = 'Tissue segmentation')
 # frame4.config(relief=SUNKEN, bd=2)
 # frame4.place(x=5, y=480, width=490, height=50)
 
-label1 = Label(frame1, text = "Input structural image:").place(x=5,y=5)
+label1 = Label(frame1, text = "Folder containing the T1.nii.gz image:").place(x=5,y=5)
 btn_enter_structural_input = Button(frame1, text = "Browse", command = btn_enter_structural_input_command).place(x=5, y=30)
-entr_address_structural_input = Entry(frame1, textvariable = var_structural_address_input).place(x=100, y=35, width=365)
+entr_address_structural_input = Entry(frame1, textvariable = var_file_address_input).place(x=100, y=35, width=365)
 
 label2 = Label(frame1, text = "Output folder:").place(x=5, y=70)
 btn_enter_structural_output = Button(frame1, text="Browse", command = btn_enter_structural_output_command).place(x=5, y=95)
