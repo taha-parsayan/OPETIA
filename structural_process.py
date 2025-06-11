@@ -27,8 +27,6 @@ var_BET_function = StringVar()
 var_BET_function.set('Standard brain extraction using bet2')
 var_reg_dof = StringVar()
 var_reg_dof.set('Affine - 12DOF')
-var_reg_ref = StringVar()
-var_reg_ref.set('/opt/easybuild/software/FSL/6.0.3-foss-2019b-Python-3.7.4/fsl/data/standard/MNI152lin_T1_2mm_brain.nii.gz')
 var_reg_cost = StringVar()
 var_reg_cost.set('Correlation ratio')
 var_reg_interp = StringVar()
@@ -36,6 +34,19 @@ var_reg_interp.set('Tri-linear')
 var_FAST_chechbtn = IntVar()
 var_FAST_chechbtn.set(1)
 
+var_reg_ref = StringVar()
+
+def is_mac():
+    return platform.system() == 'Darwin'
+
+def is_linux():
+    return platform.system() == 'Linux'
+
+fsl_dir = os.environ.get('FSLDIR')
+if is_linux():
+    var_reg_ref.set(fsl_dir + '/6.0.3-foss-2019b-Python-3.7.4/fsl/data/standard/MNI152lin_T1_2mm_brain.nii.gz')
+elif is_mac():
+    var_reg_ref.set(fsl_dir + '/data/standard/MNI152_T1_2mm_brain.nii.gz')
 
 #___Commands
 def btn_enter_structural_input_command():
@@ -47,10 +58,14 @@ def btn_enter_structural_input_command():
 
 def btn_show_image_command():
     img1 = var_structural_address_output.get() + '/structural_brain_std.nii.gz'
-    img2 = '/opt/easybuild/software/FSL/6.0.3-foss-2019b-Python-3.7.4/fsl/data/standard/MNI152lin_T1_2mm_brain.nii.gz'
+    img2 = var_reg_ref.get() # MNI reference image
     img3 = var_structural_address_output.get() + '/structural_quality_control.png'
     os.system('slicer ' + img1 + ' ' + img2 + ' -A 1500 ' + img3)
-    os.system('eog ' + img3)
+
+    if platform.system() == 'Linux':
+        os.system(f'eog "{img3}" &')
+    elif platform.system() == 'Darwin':
+        os.system(f'open "{img3}"')
 
 def btn_enter_structural_output_command():
     path = myfunctions.get_address_folder()
