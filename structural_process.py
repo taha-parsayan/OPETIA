@@ -74,9 +74,9 @@ def btn_enter_structural_output_command():
     var_structural_address_output.set(path)
 
 def btn_process_command():
-    if var_structural_address_input.get() == "Not defined...":
+    if var_file_address_input.get() == "Not defined...":
         messagebox.showinfo("Error...", "Please fill the structural image address")
-    elif var_structural_address_input.get() == "":
+    elif var_file_address_input.get() == "":
         messagebox.showinfo("Error...", "Please fill the structural image address")
     elif var_structural_address_output.get() == "Not defined...":
         messagebox.showinfo("Error...", "Please fill the Output address")
