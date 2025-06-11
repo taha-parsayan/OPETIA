@@ -5,6 +5,8 @@ import myfunctions
 import webbrowser
 import time
 import threading
+import subprocess
+import platform
 
 root = tk.Tk()
 root.geometry("500x755+0+0")
@@ -71,7 +73,16 @@ def btn_enter_pet_output_command():
     var_reg_pet2highrez_ref.set(var_pet_address_output.get() + '/structural_brain.nii.gz')
 
 def btn_open_folder_command():
-    webbrowser.open(var_pet_address_output.get())
+    if is_mac():
+            subprocess.call(["open", var_address_input.get()])
+    elif is_linux():
+            subprocess.call(["xdg-open", var_address_input()])
+
+def is_mac():
+    return platform.system() == 'Darwin'
+
+def is_linux():
+    return platform.system() == 'Linux'
 
 def btn_process_command():
     if var_pet_address_input.get() == "Not defined...":
