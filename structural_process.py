@@ -8,7 +8,8 @@ import myfunctions
 import webbrowser
 import time
 import threading
-
+import subprocess
+import platform
 
 root = Tk()
 root.geometry("500x580+0+0")
@@ -139,7 +140,16 @@ def btn_process_command():
         os.system('echo ')
 
 def btn_open_folder_command():
-    webbrowser.open(var_structural_address_output.get())
+    if is_mac():
+            subprocess.call(["open", var_address_input.get()])
+    elif is_linux():
+            subprocess.call(["xdg-open", var_address_input()])
+
+def is_mac():
+    return platform.system() == 'Darwin'
+
+def is_linux():
+    return platform.system() == 'Linux'
 
 def btn_reg_ref_command():
     path = myfunctions.get_address_file_reg_reference()
