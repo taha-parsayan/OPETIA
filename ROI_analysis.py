@@ -40,9 +40,9 @@ def btn_enter_pet_output_command():
 
 def btn_open_folder_command():
     if is_mac():
-            subprocess.call(["open", var_address_input.get()])
+            subprocess.call(["open", var_pet_address_input.get()])
     elif is_linux():
-            subprocess.call(["xdg-open", var_address_input()])
+            subprocess.call(["xdg-open", var_pet_address_input()])
 
 def is_mac():
     return platform.system() == 'Darwin'
@@ -814,7 +814,7 @@ def btn_process_command():
 
 #___GUI
 frame1 = LabelFrame(root, text='Input parameters', relief=SUNKEN, bd=2)
-frame1.place(x=5, y=5, width=490, height=315)
+frame1.place(x=5, y=5, width=490, height=320)
 
 Label(frame1, text="Folder including pre-processed data (OPETIA_output):").place(x=5, y=5)
 Button(frame1, text="Browse", command=btn_enter_pet_input_command).place(x=5, y=30)
