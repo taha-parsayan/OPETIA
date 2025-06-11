@@ -24,6 +24,8 @@ var_structural_address_output = StringVar()
 var_structural_address_output.set("Not defined...")
 var_BET_threshold = StringVar()
 var_BET_threshold.set("0.5")
+var_BET_g = StringVar()
+var_BET_g.set("0")
 var_BET_function = StringVar()
 var_BET_function.set('Standard brain extraction using bet2')
 var_reg_dof = StringVar()
@@ -79,7 +81,7 @@ def btn_process_command():
         print('echo ----------------Structural image pre-processing----------------')
         
         print('--->Extracting the brain')
-        myfunctions.FSL_Brain_Extraction(var_structural_address_input.get(), var_structural_address_output.get() + '/structural_brain.nii.gz', var_BET_threshold.get(), var_BET_function.get())
+        myfunctions.FSL_Brain_Extraction(var_structural_address_input.get(), var_structural_address_output.get() + '/structural_brain.nii.gz', var_BET_threshold.get(), var_BET_function.get(), var_BET_g.get())
         print('Done')
 
         print('--->Registering structural image to standard space using FNIRT')
@@ -161,30 +163,19 @@ btn_enter_structural_output = Button(frame1, text="Browse", command = btn_enter_
 entr_address_structural_output = Entry(frame1, textvariable = var_structural_address_output).place(x=100, y=100, width=365)
 
 label3 = Label(frame2, text = "Fractional intensity threshold:").place(x=5,y=5)
-entr_BET_threshold = Entry(frame2, textvariable = var_BET_threshold).place(x=425,y=5, width=35)
+entr_BET_threshold = Entry(frame2, textvariable = var_BET_threshold).place(x=190,y=5, width=35)
 
-label4 = Label(frame2, text="Function/Modality:").place(x=5, y=30)
+label4 = Label(frame2, text = "Vertical gradient:").place(x=315,y=5)
+entr_BET_g = Entry(frame2, textvariable = var_BET_g).place(x=425,y=5, width=35)
+
+label5 = Label(frame2, text="Function/Modality:").place(x=5, y=30)
 combo_BET_function = ttk.Combobox(frame2, textvariable=var_BET_function, values=('Standard brain extraction using bet2', 'Robust brain centre estimation',
 'Eye & optic nerve cleanup', 'Bias field & neck cleanup', 'Improve BET if FOV is very small in Z', 'Apply to 4D FMRI data',
 'Run bet2 and then betsurf to get additional skull and scalp surfaces', 'As above, when also feeding in non-brain-extracted T2'), state= 'readonly').place(x=5, y=60, width=460)
 
-
 label6 = Label(frame3, text="Standard template (MNI152_T1_2mm_brain.nii.gz)").place(x=5, y=5)
 btn_reg_ref = Button(frame3, text='Browse', command = btn_reg_ref_command).place(x=5,y=30)
 entr_reg_ref = Entry(frame3, textvariable = var_reg_ref).place(x=100, y=35, width=365)
-
-# label5 = Label(frame3, text='Degree of freedom:').place(x=5, y=75)
-# combo_reg_dof = ttk.Combobox(frame3, textvariable=var_reg_dof, values = ('Translation only - 3DOF', 'Rigid body - 6DOF', 'Gloval rescale - 7DOF',
-# 'Traditional - 9DOF', 'Affine - 12DOF'), state= 'readonly').place(x=265, y=75, width=200)
-
-# label9 = Label(frame3, text="Cost function:").place(x=5,y=100)
-# combo_reg_cost = ttk.Combobox(frame3, textvariable=var_reg_cost, values = ('Correlation ratio', 'Mutual information', 'Normalised mutual information',
-# 'Normalised correlation', 'Least squares'), state= 'readonly').place(x=265, y=100, width=200)
-
-# label10 = Label(frame3, text="Interpolation:").place(x=5, y=125)
-# combo_reg_interp = ttk.Combobox(frame3, textvariable=var_reg_interp, values = ('Nearest neighbour', 'Tri-linear', 'Spline', 'Lanczos'), state = 'readonly').place(x=265, y=125, width=200)
-
-# label11 = Checkbutton(frame4, text = "Run FAST segmentation", variable = var_FAST_chechbtn).place(x=5, y=5)
 
 btn_process = Button(root, text = "Process", command = btn_process_command).place(x=5, y=390, width=490)
                      
