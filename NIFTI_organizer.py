@@ -79,7 +79,7 @@ def btn_process_command():
                     if contains_keyword(file, t1_keywords):
                         new_name = 'T1.nii.gz'
                     elif contains_keyword(file, pet_keywords):
-                        new_name = 'PET.nii.gz'
+                        new_name = 'PET_Dynamic.nii.gz'
                     else:
                         continue
 
@@ -88,7 +88,7 @@ def btn_process_command():
                         os.rename(file_path, new_path)
 
                 # Process PET
-                path_PET = os.path.join(item_path, 'PET.nii.gz')
+                path_PET = os.path.join(item_path, 'PET_Dynamic.nii.gz')
                 if os.path.exists(path_PET):
                     subprocess.run(['fslsplit', path_PET, os.path.join(item_path, 'vol')])
                     # gunzip each vol*.nii.gz file
@@ -109,7 +109,7 @@ def btn_process_command():
             continue
         folder_path = os.path.join(main_directory, folder_name)
         address1 = os.path.join(folder_path, 'T1.nii.gz')
-        address2 = os.path.join(folder_path, 'PET.nii.gz')
+        address2 = os.path.join(folder_path, 'PET_Dynamic.nii.gz')
 
         if not os.path.exists(address1):
             print('------ Could not create:', address1)
