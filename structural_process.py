@@ -12,7 +12,7 @@ import subprocess
 import platform
 
 root = Tk()
-root.geometry("500x580+0+0")
+root.geometry("500x500+0+0")
 root.resizable(False, False)
 root.title("Structural image pre-processing")
 
@@ -34,20 +34,8 @@ var_reg_interp = StringVar()
 var_reg_interp.set('Tri-linear')
 var_FAST_chechbtn = IntVar()
 var_FAST_chechbtn.set(1)
-
 var_reg_ref = StringVar()
-
-def is_mac():
-    return platform.system() == 'Darwin'
-
-def is_linux():
-    return platform.system() == 'Linux'
-
-fsl_dir = os.environ.get('FSLDIR')
-if is_linux():
-    var_reg_ref.set(fsl_dir + '/6.0.3-foss-2019b-Python-3.7.4/fsl/data/standard/MNI152lin_T1_2mm_brain.nii.gz')
-elif is_mac():
-    var_reg_ref.set(fsl_dir + '/data/standard/MNI152_T1_2mm_brain.nii.gz')
+var_reg_ref.set("Templates/MNI152_T1_2mm_brain.nii.gz")
 
 #___Commands
 def btn_enter_structural_input_command():
@@ -87,74 +75,53 @@ def btn_process_command():
     elif var_reg_ref.get() == "":
         messagebox.showinfo("Error...", "Please fill the registration reference")
     else:
-        os.system('echo ')
-        os.system('echo ----------------Structural image pre-processing----------------')
-        os.system('echo ')
-        os.system('echo ---Extracting the brain')
+        print('\n')
+        print('echo ----------------Structural image pre-processing----------------')
+        
+        print('--->Extracting the brain')
         myfunctions.FSL_Brain_Extraction(var_structural_address_input.get(), var_structural_address_output.get() + '/structural_brain.nii.gz', var_BET_threshold.get(), var_BET_function.get())
-        os.system('echo Done')
+        print('Done')
 
-        os.system('echo ---Registering structural image to standard space using FLIRT')
+        print('--->Registering structural image to standard space using FNIRT')
+
         reg_input = var_structural_address_output.get() + '/structural_brain.nii.gz'
         reg_output = var_structural_address_output.get() + '/structural_brain_std.nii.gz'
         reg_ref = var_reg_ref.get()
-        reg_model = var_reg_dof.get()
-        reg_cost = var_reg_cost.get()
-        reg_interp = var_reg_interp.get()
-        matrix_name = var_structural_address_output.get() + '/structural2std.mat'
-        myfunctions.register_flirt(reg_input, reg_output, reg_ref, reg_model, matrix_name, reg_cost, reg_interp)
-        os.system('echo Done')
 
-        #if var_FAST_chechbtn.get() == 1:
-        os.system('echo ---Native image tissue segmentation - GM,WM,CSF')
-        fast_input = var_structural_address_output.get() + '/structural_brain.nii.gz'
+        # Call the FNIRT function (FLIRT is handled inside)
+        myfunctions.register_fnirt(
+            input_file=reg_input,
+            output=reg_output,
+            ref=reg_ref
+        )
+
+        print('Done')
+
+
+        print('--->Tissue segmentation - GM,WM,CSF')
+        fast_input = var_structural_address_output.get() + '/structural_brain_std.nii.gz'
         fast_output = var_structural_address_output.get()
         myfunctions.FSL_FAST(fast_input, fast_output)
 
-        os.system('echo Done')
-
-        os.system('echo ---Registering segments to standard space using FLIRT')
-        reg_input = var_structural_address_output.get() + '/fast_pve_0.nii.gz'
-        reg_output = var_structural_address_output.get() + '/fast_pve_0_std.nii.gz'
-        reg_mat_b2c = var_structural_address_output.get() + '/structural2std.mat'
-        reg_ref = var_reg_ref.get()
-        myfunctions.register_using_matrix(reg_input, reg_output, reg_mat_b2c, reg_ref)
-
-        reg_input = var_structural_address_output.get() + '/fast_pve_1.nii.gz'
-        reg_output = var_structural_address_output.get() + '/fast_pve_1_std.nii.gz'
-        reg_mat_b2c = var_structural_address_output.get() + '/structural2std.mat'
-        reg_ref = var_reg_ref.get()
-        myfunctions.register_using_matrix(reg_input, reg_output, reg_mat_b2c, reg_ref)
-
-        reg_input = var_structural_address_output.get() + '/fast_pve_2.nii.gz'
-        reg_output = var_structural_address_output.get() + '/fast_pve_2_std.nii.gz'
-        reg_mat_b2c = var_structural_address_output.get() + '/structural2std.mat'
-        reg_ref = var_reg_ref.get()
-        myfunctions.register_using_matrix(reg_input, reg_output, reg_mat_b2c, reg_ref)
-
-
-        os.system('fslmaths ' + fast_output + '/fast_pve_0_std.nii.gz ' + '-thr 0.3 ' + fast_output + '/csf_mask_std.nii.gz')
+        os.system('fslmaths ' + fast_output + '/fast_pve_0.nii.gz ' + '-thr 0.3 ' + fast_output + '/csf_mask_std.nii.gz')
         os.system('fslmaths ' + fast_output + '/csf_mask_std.nii.gz ' + '-bin ' + fast_output + '/csf_mask_std.nii.gz')
         #os.system('fslmaths ' + fast_output + '/structural_brain_std.nii.gz ' + '-mul ' + fast_output + '/csf_mask_std.nii.gz ' + fast_output + '/csf_std.nii.gz')
 
-        os.system('fslmaths ' + fast_output + '/fast_pve_1_std.nii.gz ' + '-thr 0.3 ' + fast_output + '/graymatter_mask_std.nii.gz')
+        os.system('fslmaths ' + fast_output + '/fast_pve_1.nii.gz ' + '-thr 0.3 ' + fast_output + '/graymatter_mask_std.nii.gz')
         os.system('fslmaths ' + fast_output + '/graymatter_mask_std.nii.gz ' + '-bin ' + fast_output + '/graymatter_mask_std.nii.gz')
         #os.system('fslmaths ' + fast_output + '/structural_brain_std.nii.gz ' + '-mul ' + fast_output + '/graymatter_mask_std.nii.gz ' + fast_output + '/graymatter_std.nii.gz')
 
-        os.system('fslmaths ' + fast_output + '/fast_pve_2_std.nii.gz ' + '-thr 0.3 ' + fast_output + '/whitematter_mask_std.nii.gz')
+        os.system('fslmaths ' + fast_output + '/fast_pve_2.nii.gz ' + '-thr 0.3 ' + fast_output + '/whitematter_mask_std.nii.gz')
         os.system('fslmaths ' + fast_output + '/whitematter_mask_std.nii.gz ' + '-bin ' + fast_output + '/whitematter_mask_std.nii.gz')
         #os.system('fslmaths ' + fast_output + '/structural_brain_std.nii.gz ' + '-mul ' + fast_output + '/whitematter_mask_std.nii.gz ' + fast_output + '/whitematter_std.nii.gz')
 
+        print('Done')
 
+        print('\n')
 
-        os.system('echo Done')
+        print('Finish!')
+        print('--------------------------------------------')
 
-        os.system('echo ---')
-
-        os.system('echo ')
-        os.system('echo ----------Finish!')
-        os.system('echo --------------------------------------------')
-        os.system('echo ')
 
 def btn_open_folder_command():
     if is_mac():
@@ -175,7 +142,7 @@ def btn_reg_ref_command():
 #___GUI
 frame1 = LabelFrame(root, text='Define input/output')
 frame1.config(relief=SUNKEN, bd=2)
-frame1.place(x=5, y=5, width=490, height=150)
+frame1.place(x=5, y=5, width=490, height=155)
 
 frame2 = LabelFrame(root, text = 'Brain Extraction (set BET parameters)')
 frame2.config(relief=SUNKEN, bd=2)
@@ -183,11 +150,7 @@ frame2.place(x=5, y=170, width=490, height=110)
 
 frame3 = LabelFrame(root, text = 'Registration (native structural space to standard space)')
 frame3.config(relief=SUNKEN, bd=2)
-frame3.place(x=5, y=295, width=490, height=175)
-
-# frame4 = LabelFrame(root, text = 'Tissue segmentation')
-# frame4.config(relief=SUNKEN, bd=2)
-# frame4.place(x=5, y=480, width=490, height=50)
+frame3.place(x=5, y=295, width=490, height=90)
 
 label1 = Label(frame1, text = "Folder containing the T1.nii.gz image:").place(x=5,y=5)
 btn_enter_structural_input = Button(frame1, text = "Browse", command = btn_enter_structural_input_command).place(x=5, y=30)
@@ -209,23 +172,25 @@ combo_BET_function = ttk.Combobox(frame2, textvariable=var_BET_function, values=
 label6 = Label(frame3, text='Reference:').place(x=5, y=5)
 btn_reg_ref = Button(frame3, text='Browse', command = btn_reg_ref_command).place(x=5,y=30)
 entr_reg_ref = Entry(frame3, textvariable = var_reg_ref).place(x=100, y=35, width=365)
-label5 = Label(frame3, text='Degree of freedom:').place(x=5, y=75)
-combo_reg_dof = ttk.Combobox(frame3, textvariable=var_reg_dof, values = ('Translation only - 3DOF', 'Rigid body - 6DOF', 'Gloval rescale - 7DOF',
-'Traditional - 9DOF', 'Affine - 12DOF'), state= 'readonly').place(x=265, y=75, width=200)
-label9 = Label(frame3, text="Cost function:").place(x=5,y=100)
-combo_reg_cost = ttk.Combobox(frame3, textvariable=var_reg_cost, values = ('Correlation ratio', 'Mutual information', 'Normalised mutual information',
-'Normalised correlation', 'Least squares'), state= 'readonly').place(x=265, y=100, width=200)
 
-label10 = Label(frame3, text="Interpolation:").place(x=5, y=125)
-combo_reg_interp = ttk.Combobox(frame3, textvariable=var_reg_interp, values = ('Nearest neighbour', 'Tri-linear', 'Spline', 'Lanczos'), state = 'readonly').place(x=265, y=125, width=200)
+# label5 = Label(frame3, text='Degree of freedom:').place(x=5, y=75)
+# combo_reg_dof = ttk.Combobox(frame3, textvariable=var_reg_dof, values = ('Translation only - 3DOF', 'Rigid body - 6DOF', 'Gloval rescale - 7DOF',
+# 'Traditional - 9DOF', 'Affine - 12DOF'), state= 'readonly').place(x=265, y=75, width=200)
+
+# label9 = Label(frame3, text="Cost function:").place(x=5,y=100)
+# combo_reg_cost = ttk.Combobox(frame3, textvariable=var_reg_cost, values = ('Correlation ratio', 'Mutual information', 'Normalised mutual information',
+# 'Normalised correlation', 'Least squares'), state= 'readonly').place(x=265, y=100, width=200)
+
+# label10 = Label(frame3, text="Interpolation:").place(x=5, y=125)
+# combo_reg_interp = ttk.Combobox(frame3, textvariable=var_reg_interp, values = ('Nearest neighbour', 'Tri-linear', 'Spline', 'Lanczos'), state = 'readonly').place(x=265, y=125, width=200)
 
 # label11 = Checkbutton(frame4, text = "Run FAST segmentation", variable = var_FAST_chechbtn).place(x=5, y=5)
 
-btn_process = Button(root, text = "Process", command = btn_process_command).place(x=5, y=475, width=490)
+btn_process = Button(root, text = "Process", command = btn_process_command).place(x=5, y=390, width=490)
                      
-btn_show_image = Button(root, text = "Show processed image", command = btn_show_image_command).place(x=5, y=510, width=490)
+btn_show_image = Button(root, text = "Show processed image", command = btn_show_image_command).place(x=5, y=425, width=490)
 
-btn_open_folder = Button(root, text="Open output folder", command = btn_open_folder_command).place(x=5, y=545, width=490)
+btn_open_folder = Button(root, text="Open output folder", command = btn_open_folder_command).place(x=5, y=460, width=490)
 
 
 root.mainloop()
