@@ -169,7 +169,7 @@ combo_BET_function = ttk.Combobox(frame2, textvariable=var_BET_function, values=
 'Run bet2 and then betsurf to get additional skull and scalp surfaces', 'As above, when also feeding in non-brain-extracted T2'), state= 'readonly').place(x=5, y=60, width=460)
 
 
-label6 = Label(frame3, text='Reference:').place(x=5, y=5)
+label6 = Label(frame3, text="Standard template (MNI152_T1_2mm_brain.nii.gz)").place(x=5, y=5)
 btn_reg_ref = Button(frame3, text='Browse', command = btn_reg_ref_command).place(x=5,y=30)
 entr_reg_ref = Entry(frame3, textvariable = var_reg_ref).place(x=100, y=35, width=365)
 
