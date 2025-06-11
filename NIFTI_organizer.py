@@ -103,6 +103,7 @@ def btn_process_command():
 
     print('Done\n')
 
+
     # Verification
     for folder_name in os.listdir(main_directory):
         if folder_name.startswith('.') or not os.path.isdir(os.path.join(main_directory, folder_name)):
