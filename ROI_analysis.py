@@ -9,7 +9,7 @@ import time
 import threading
 import subprocess
 import shutil
-
+import platform
 
 root = Tk()
 root.geometry("500x395+0+0")
@@ -39,7 +39,16 @@ def btn_enter_pet_output_command():
     var_pet_address_output.set(path)
 
 def btn_open_folder_command():
-    webbrowser.open(var_pet_address_output.get())
+    if is_mac():
+            subprocess.call(["open", var_address_input.get()])
+    elif is_linux():
+            subprocess.call(["xdg-open", var_address_input()])
+
+def is_mac():
+    return platform.system() == 'Darwin'
+
+def is_linux():
+    return platform.system() == 'Linux'
 
 
 def btn_process_command():
