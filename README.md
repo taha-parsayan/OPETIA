@@ -6,7 +6,8 @@
 ![Static Badge](https://img.shields.io/badge/FSL-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/PET%20/%20MRI-4CAF50)
 
-### OPETIA documentation and user guide:
+### OPETIA documentation and user guide
+Please refer to the following link for detailed documentation and how to install and use OPETIA:
 [OPETIA documentation](https://opetia-docs.readthedocs.io/en/latest/index.html)
 
 ### Introduction
