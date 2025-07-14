@@ -6,6 +6,8 @@
 ![Static Badge](https://img.shields.io/badge/FSL-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/PET%20/%20MRI-4CAF50)
 
+### OPETIA documentation and user guide:
+[OPETIA documentation](https://opetia-docs.readthedocs.io/en/latest/index.html)
 
 ### Introduction
 OPETIA is a user-friendly PET/MRI (Positron Emission Tomography / Magnetic Resonance Imaging) image analysis software, developed based on the [FSL](https://process.innovation.ox.ac.uk/software/p/9564/fslv5/1) software (Functional Magnetic Resonance Imaging of the Brain Software Library) and Python, for accurate brain image quantification. While FSL is widely used for MRI, OPETIA extends its functionality to PET imaging, offering a graphical user interface (GUI) to preprocess images and calculate SUV (Standardized Uptake Value) and SUVR (Standardized Uptake Value ratio) values. Image processing with OPETIA does not require users to have previous knowledge of medical image processing or programming since all the parameters for both MRI and PET image pre-processing are already set by default. At the same time, these parameters are provided in the GUI so that the users can modify them if needed.
