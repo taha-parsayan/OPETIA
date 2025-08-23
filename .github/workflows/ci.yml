@@ -1,28 +1,13 @@
-name: CI
-
-on:
-  push:
-    branches:
-      - main
-      - v2
-
 jobs:
   run_opetia:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
-      # Step 1: Get the repo code
       - uses: actions/checkout@v3
-
-      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      # Step 4: Run OPETIA.py
       - name: Run OPETIA
         run: python OPETIA.py
