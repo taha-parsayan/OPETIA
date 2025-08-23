@@ -10,7 +10,7 @@ import ants
 import antspynet
 
 #------------------------------
-# Image Registration
+# Image Registration to MNI Space
 #------------------------------
 def register_to_MNI(img_address, output_address):
 
@@ -35,34 +35,47 @@ def register_to_MNI(img_address, output_address):
 
     return img_reg
 
-# img_address = "/Users/taha/Desktop/ADNI/033_S_0920/T1.nii.gz"
-# img_dir = os.path.dirname(img_address)
-# output_address = os.path.join(img_dir, "OPETIA_output", "T1_std.nii.gz")
-# reg = ipf.register_to_MNI(img_address, output_address)
+#------------------------------
+# Skull Stripping using ANTsPyNet
+#------------------------------
+def skull_strip(img_address, output_address):
 
+    # Load image
+    img = ants.image_read(img_address)
 
+    # Brain extraction
+    brain_mask = antspynet.brain_extraction(img, modality="t1")
+    img_brain = img * brain_mask
 
-T1 = ants.image_read("/Users/taha/Desktop/ADNI/033_S_0920/OPETIA_output/T1_std.nii.gz")
-brain_mask = antspynet.brain_extraction(T1, modality="t1")
-T1_brain = T1 * brain_mask
-ants.plot(T1_brain)
+    # Save the skull-stripped image
+    ants.image_write(img_brain, output_address)
 
-# Optional: Save the skull-stripped image
-ants.image_write(T1_brain, "/Users/taha/Desktop/ADNI/033_S_0920/T1_brain.nii.gz")
+    return img_brain
 
+#------------------------------
+# Tissue Segmentation using Atropos
+#------------------------------
+def tissue_segmentation(img_address, output_address):
 
-T1_brain_n4 = ants.n4_bias_field_correction(T1_brain)
+    # Load image
+    img = ants.image_read(img_address)
 
+    # N4 Bias Field Correction
+    img_n4 = ants.n4_bias_field_correction(img)
 
-seg = ants.atropos(
-    a=T1_brain_n4,
-    x=brain_mask,           # Use brain mask to restrict segmentation
-    i='kmeans[3]',          # 3 tissue classes
-    m='[0.1,1x1x1]',        # smoothing
-    c=5                     # max iterations
-)
+    # Brain extraction to get brain mask
+    brain_mask = antspynet.brain_extraction(img, modality="t1")
 
-# seg['segmentation'] contains labeled image: 1=CSF, 2=GM, 3=WM
-ants.plot(T1_brain_n4, seg['segmentation'])
-ants.image_write(seg['segmentation'], "/Users/taha/Desktop/ADNI/033_S_0920/T1_seg.nii.gz")
+    # Tissue segmentation using Atropos
+    seg = ants.atropos(
+        a=img_n4,
+        x=brain_mask,           # Use brain mask to restrict segmentation
+        i='kmeans[3]',          # 3 tissue classes
+        m='[0.1,1x1x1]',        # smoothing
+        c=5                     # max iterations
+    )
 
+    # Save the segmentation result
+    ants.image_write(seg['segmentation'], output_address)
+
+    return seg['segmentation']
