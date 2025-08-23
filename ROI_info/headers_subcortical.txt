@@ -1,0 +1,1 @@
+Number Area_name SUV_subcortical_min SUV_subcortical_max SUV_subcortical_mean SUV_subcortical_sd SUVR_subcortical_min SUVR_subcortical_max SUVR_subcortical_mean SUVR_subcortical_sd Subcortical_volume
