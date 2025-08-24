@@ -15,14 +15,15 @@ import customtkinter as ctk
 from tkinter import filedialog
 import tkinter.messagebox as messagebox
 import tkinter as tk
-
+import time
+import shutil
 #------------------------------
 # GUI Setup
 #------------------------------
 
 # Set appearance and theme
-ctk.set_appearance_mode("dark")  # modes: "System", "Dark", "Light"
-ctk.set_default_color_theme("blue")  # themes: "blue", "green", "dark-blue"
+ctk.set_appearance_mode("light")  # modes: "System", "Dark", "Light"
+ctk.set_default_color_theme("green")  # themes: "blue", "green", "dark-blue"
 
 # Create the app window
 app = ctk.CTk()  
@@ -115,10 +116,91 @@ def checkbox_reg():
     if var_check_reg.get() == 1:
         combobox2.configure(state="normal")
         combobox3.configure(state="normal")
+        btn4.configure(state="normal")
         set_reg_type(var_reg_type.get())
     else:
         combobox2.configure(state="disabled")
         combobox3.configure(state="disabled")
+        btn4.configure(state="disabled")
+
+
+
+# Image processing pipeline
+def btn_process_data():
+
+    t1 = time.time()
+
+    print("\n")
+    print("____________OPETIA is Processing your data___________")
+
+    # Create output directory if it doesn't exist
+    if not os.path.exists(var_output_path.get()):
+        os.makedirs(var_output_path.get())
+    else:
+        shutil.rmtree(var_output_path.get())
+        os.makedirs(var_output_path.get())
+
+
+    # Skull Stripping
+    print("\n")
+    print("Skull Stripping...")
+
+    output_path = os.path.join(var_output_path.get(), "T1_brain.nii.gz")
+    output_path_mask = os.path.join(var_output_path.get(), "T1_brain_mask.nii.gz")
+    try:
+        ipf.skull_strip(var_T1_path.get(), output_path, output_path_mask, mri_modality)
+        print("Skull Stripping completed successfully.")
+    except Exception as e:
+        print(f"Error during Skull Stripping:\n{e}")
+
+    # Tissue Segmentation
+    print("\n")
+    print("Tissue Segmentation in native space...")
+    input_image = os.path.join(var_output_path.get(), "T1_brain.nii.gz")
+    brain_mask = os.path.join(var_output_path.get(), "T1_brain_mask.nii.gz")
+    output_path = os.path.join(var_output_path.get(), "T1_brain_segmentation.nii.gz")
+    try:
+        ipf.tissue_segmentation(input_image, brain_mask, output_path)
+        print("Tissue Segmentation completed successfully.") 
+    except Exception as e:
+        print(f"Error during Tissue Segmentation:\n{e}")
+
+    # Registration to MNI space
+    print("\n")
+    print("Image registration to MNI152 space...")
+    input_image = os.path.join(var_output_path.get(), "T1_brain.nii.gz")
+    output_path = os.path.join(var_output_path.get(), "T1_brain_MNI.nii.gz")
+    try:
+        ipf.register_to_MNI(input_image, output_path, registration_type)
+        print("Registration to MNI152 space completed successfully.")
+    except Exception as e:
+        print(f"Error during Registration to MNI152 space:\n{e}")
+
+    # Registration of segments to MNI space
+    print("\n")
+    print("Registration of image segments from native to MNI152 space...")
+    input_image = os.path.join(var_output_path.get(), "T1_brain_segmentation.nii.gz")
+    output_path = os.path.join(var_output_path.get(), "T1_brain_segmentation_MNI.nii.gz")
+    transform_list = [os.path.join(var_output_path.get(), "native_to_mni_1Warp.nii.gz"), os.path.join(var_output_path.get(), "native_to_mni_0GenericAffine.mat")]
+
+    try:
+        ipf.apply_transform_to_image(input_image, output_path, transform_list)
+        print("Registration of Image segments to MNI152 space completed successfully.")
+    except Exception as e:
+        print(f"Error during Registration of Image segments to MNI152 space:\n{e}")
+
+    t2 = time.time()
+    print("\nFinished processing.")
+    print(f"Total time: {(t2-t1)/60:.2f} minutes")
+
+
+def btn_show_reg_result():
+    try:
+        mni_img_path = os.path.join(os.getcwd(), "Templates/MNI152_T1_2mm_brain.nii.gz")
+        reg_img_path = os.path.join(var_output_path.get(), "T1_brain_MNI.nii.gz")
+        ipf.plot_overlay(mni_img_path, reg_img_path, "Registration Result: MNI (background) and T1 (overlay)")
+    except Exception as e:
+        print(f"Error displaying registration result:\n{e}")
 
 #------------------------------
 # GUI Elements
@@ -208,8 +290,15 @@ combobox3 = ctk.CTkComboBox(master=frame3, width=380, values=list(nonlinear_opti
                                 command=set_reg_type)
 combobox3.place(x=5, y=95)
 
+#-------------------------------------
+# Processing buttons
+
+btn3 = ctk.CTkButton(master=app, text="Process data", width=390, height=25, command=btn_process_data)
+btn3.place(x=5, y=380)
+
+btn4 = ctk.CTkButton(master=app, text="Show registration result", width=390, height=25, command=btn_show_reg_result)
+btn4.place(x=5, y=410)
 
 # Run the app
 app.mainloop()
-
 
