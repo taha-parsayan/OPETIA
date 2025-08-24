@@ -46,7 +46,9 @@ var_mri_modality.set("T1 weighted")
 var_reg_class = ctk.StringVar()
 var_reg_class.set("Nonlinear")
 var_reg_type = ctk.StringVar()
-var_reg_type.set("Elastic deformation using SyN")
+var_reg_type.set("Symmetric normalization (nonlinear warp)")
+var_check_reg = ctk.IntVar()
+var_check_reg.set(1)
 
 """ Other Global Variables """
 mri_modality = "t1"
@@ -109,12 +111,20 @@ def set_reg_type(registration_type):
     else:  # Nonlinear
         registration_type = nonlinear_options_dict[registration_type]
 
-    print(f"Selected registration type: {registration_type}")
-
+def checkbox_reg():
+    if var_check_reg.get() == 1:
+        combobox2.configure(state="normal")
+        combobox3.configure(state="normal")
+        set_reg_type(var_reg_type.get())
+    else:
+        combobox2.configure(state="disabled")
+        combobox3.configure(state="disabled")
 
 #------------------------------
 # GUI Elements
 #------------------------------
+
+# Frame1: input paths
 
 frame1 = ctk.CTkFrame(master=app, width=390, height=150, border_color="#ffffff", border_width=1)
 frame1.place(x=5, y=5)
@@ -139,6 +149,7 @@ entry2.place(x=120, y=110)
 
 
 #-------------------------------------
+# Frame2: MRI Modality Selection
 
 frame2 = ctk.CTkFrame(master=app, width=390, height=45, border_color="#ffffff", border_width=1)
 frame2.place(x=5, y=160)
@@ -153,9 +164,14 @@ combobox1 = ctk.CTkComboBox(master=frame2, width=235, height=25,
 combobox1.place(x=150, y=10)
 
 #-------------------------------------
+# Frame3: Registration Options
+
+# Check if registration is needed
+checkbox1 = ctk.CTkCheckBox(master=app, text="Registration to MNI152 space", variable=var_check_reg, command=checkbox_reg)
+checkbox1.place(x=5, y=210)
 
 frame3 = ctk.CTkFrame(master=app, width=390, height=135, border_color="#ffffff", border_width=1)
-frame3.place(x=5, y=210)
+frame3.place(x=5, y=240)
 
 # Linear options mapping
 linear_options_dict = {
@@ -167,8 +183,8 @@ linear_options_dict = {
 
 # Nonlinear options mapping
 nonlinear_options_dict = {
-    "Elastic deformation using SyN": "ElasticSyN",
     "Symmetric normalization (nonlinear warp)": "SyN",
+    "Elastic deformation using SyN": "ElasticSyN",
     "Nonlinear deformation (no affine initialization)": "SyNOnly",
     "SyN using cross-correlation metric": "SyNCC",
     "SyN with rigid + affine initialization": "SyNRA",
