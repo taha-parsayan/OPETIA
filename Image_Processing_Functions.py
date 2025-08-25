@@ -60,7 +60,7 @@ def tissue_segmentation(img_address, brain_mask_address, output_address):
 #------------------------------
 # Split GM, WM, CSF from Segmentation
 #------------------------------
-def split_tissues(Image_path, segmented_path, out_dir, Registered=False):
+def split_tissues(image_path, image_modality, segmented_path, out_dir, Registered):
     """
     Split a segmented T1 image into GM, WM, CSF masks.
 
@@ -90,36 +90,35 @@ def split_tissues(Image_path, segmented_path, out_dir, Registered=False):
         tissue_mask = (seg_data == label).astype(np.uint8)
         tissue_img = nib.Nifti1Image(tissue_mask, affine, header)
         if Registered:
-            out_path = os.path.join(out_dir, f"Mask_{tissue}_MNI.nii.gz")
+            out_path = os.path.join(out_dir, f"Mask_{image_modality}_{tissue}_MNI.nii.gz")
         else:
-            out_path = os.path.join(out_dir, f"Mask_{tissue}_native.nii.gz")
+            out_path = os.path.join(out_dir, f"Mask_{image_modality}_{tissue}_native.nii.gz")
         nib.save(tissue_img, out_path)
 
     # Multiply masks by the original image to get tissue-specific images
-    original_img = nib.load(Image_path)
+    original_img = nib.load(image_path)
     original_data = original_img.get_fdata()
     if Registered:
-        GM_mask = nib.load(os.path.join(out_dir, "Mask_GM_MNI.nii.gz")).get_fdata()
-        WM_mask = nib.load(os.path.join(out_dir, "Mask_WM_MNI.nii.gz")).get_fdata()
-        CSF_mask = nib.load(os.path.join(out_dir, "Mask_CSF_MNI.nii.gz")).get_fdata()
-
+        GM_mask = nib.load(os.path.join(out_dir, f"Mask_{image_modality}_GM_MNI.nii.gz")).get_fdata()
+        WM_mask = nib.load(os.path.join(out_dir, f"Mask_{image_modality}_WM_MNI.nii.gz")).get_fdata()
+        CSF_mask = nib.load(os.path.join(out_dir, f"Mask_{image_modality}_CSF_MNI.nii.gz")).get_fdata()
         GM = original_data * GM_mask
         WM = original_data * WM_mask
         CSF = original_data * CSF_mask
-        nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, "GM_MNI.nii.gz"))
-        nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, "WM_MNI.nii.gz"))
-        nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, "CSF_MNI.nii.gz"))
+        nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_GM_MNI.nii.gz"))
+        nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_WM_MNI.nii.gz"))
+        nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_CSF_MNI.nii.gz"))
     else:
-        GM_mask = nib.load(os.path.join(out_dir, "Mask_GM.nii.gz")).get_fdata()
-        WM_mask = nib.load(os.path.join(out_dir, "Mask_WM.nii.gz")).get_fdata()
-        CSF_mask = nib.load(os.path.join(out_dir, "Mask_CSF.nii.gz")).get_fdata()
+        GM_mask = nib.load(os.path.join(out_dir, f"Mask_{image_modality}_GM_native.nii.gz")).get_fdata()
+        WM_mask = nib.load(os.path.join(out_dir, f"Mask_{image_modality}_WM_native.nii.gz")).get_fdata()
+        CSF_mask = nib.load(os.path.join(out_dir, f"Mask_{image_modality}_CSF_native.nii.gz")).get_fdata()
 
         GM = original_data * GM_mask
         WM = original_data * WM_mask
         CSF = original_data * CSF_mask
-        nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, "GM.nii.gz"))
-        nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, "WM.nii.gz"))
-        nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, "CSF.nii.gz"))
+        nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_GM_native.nii.gz"))
+        nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_WM_native.nii.gz"))
+        nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_CSF_native.nii.gz"))
 
 
 #------------------------------

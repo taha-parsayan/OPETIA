@@ -17,6 +17,8 @@ import tkinter.messagebox as messagebox
 import tkinter as tk
 import time
 import shutil
+from PIL import Image
+
 #------------------------------
 # GUI Setup
 #------------------------------
@@ -28,7 +30,7 @@ ctk.set_default_color_theme("blue")  # themes: "blue", "green", "dark-blue"
 # Create the app window
 app = ctk.CTk()  
 app.title("OPETIA - MRI Image Processing")
-app.geometry("800x600")  # width x height
+app.geometry("970x475")  # width x height
 app.resizable(False, False)
 
 
@@ -155,7 +157,7 @@ def btn_process_data():
     segmented_image = os.path.join(var_output_path.get(), f"{mri_modality}_brain_segmentation.nii.gz")
     try:
         ipf.tissue_segmentation(input_image, brain_mask, output_path)
-        ipf.split_tissues(input_image, segmented_image, var_output_path.get(), False)
+        ipf.split_tissues(input_image, mri_modality, segmented_image, var_output_path.get(), False)
 
         print("Tissue Segmentation completed successfully.") 
     except Exception as e:
@@ -183,7 +185,7 @@ def btn_process_data():
 
     try:
         ipf.apply_transform_to_image(input_image, output_path, transform_list)
-        ipf.split_tissues(MRI_MNI, output_path, var_output_path.get(), True)
+        ipf.split_tissues(MRI_MNI, mri_modality, output_path, var_output_path.get(), True)
 
         print("Registration of Image segments to MNI152 space completed successfully.")
     except Exception as e:
@@ -214,6 +216,15 @@ def btn_show_seg_result():
 #------------------------------
 # GUI Elements
 #------------------------------
+
+# Pipeline image
+current_dir = os.getcwd()
+pipeline_image_path = os.path.join(current_dir, "Images", "MRI_proc_pipeline.png")
+pipeline_image = Image.open(pipeline_image_path)
+ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(550, 460))
+label_image = ctk.CTkLabel(master=app, image=ctk_image, text="")
+label_image.place(x=410, y=5)
+
 
 # Frame1: input paths
 
