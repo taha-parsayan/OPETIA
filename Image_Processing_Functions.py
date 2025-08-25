@@ -11,6 +11,7 @@ import antspynet
 import shutil
 import nibabel as nib
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap, BoundaryNorm
 
 #------------------------------
 # Skull Stripping using ANTsPyNet
@@ -54,6 +55,71 @@ def tissue_segmentation(img_address, brain_mask_address, output_address):
 
     ants.image_write(seg['segmentation'], output_address)
     return seg['segmentation']
+
+
+#------------------------------
+# Split GM, WM, CSF from Segmentation
+#------------------------------
+def split_tissues(Image_path, segmented_path, out_dir, Registered=False):
+    """
+    Split a segmented T1 image into GM, WM, CSF masks.
+
+    Parameters
+    ----------
+    segmented_path : str
+        Path to segmented NIfTI file (e.g. T1_segmented.nii.gz).
+    out_dir : str
+        Directory where GM, WM, CSF images will be saved.
+    """
+
+    # Load the segmentation
+    seg_img = nib.load(segmented_path)
+    seg_data = seg_img.get_fdata() # labels: 1=CSF, 2=GM, 3=WM
+    affine = seg_img.affine 
+    header = seg_img.header
+
+    # Define tissue labels
+    tissue_labels = {
+        "CSF": 1,
+        "GM": 2,
+        "WM": 3
+    }
+
+    # Create and save binary masks for each tissue
+    for tissue, label in tissue_labels.items():
+        tissue_mask = (seg_data == label).astype(np.uint8)
+        tissue_img = nib.Nifti1Image(tissue_mask, affine, header)
+        if Registered:
+            out_path = os.path.join(out_dir, f"Mask_{tissue}_MNI.nii.gz")
+        else:
+            out_path = os.path.join(out_dir, f"Mask_{tissue}_native.nii.gz")
+        nib.save(tissue_img, out_path)
+
+    # Multiply masks by the original image to get tissue-specific images
+    original_img = nib.load(Image_path)
+    original_data = original_img.get_fdata()
+    if Registered:
+        GM_mask = nib.load(os.path.join(out_dir, "Mask_GM_MNI.nii.gz")).get_fdata()
+        WM_mask = nib.load(os.path.join(out_dir, "Mask_WM_MNI.nii.gz")).get_fdata()
+        CSF_mask = nib.load(os.path.join(out_dir, "Mask_CSF_MNI.nii.gz")).get_fdata()
+
+        GM = original_data * GM_mask
+        WM = original_data * WM_mask
+        CSF = original_data * CSF_mask
+        nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, "GM_MNI.nii.gz"))
+        nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, "WM_MNI.nii.gz"))
+        nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, "CSF_MNI.nii.gz"))
+    else:
+        GM_mask = nib.load(os.path.join(out_dir, "Mask_GM.nii.gz")).get_fdata()
+        WM_mask = nib.load(os.path.join(out_dir, "Mask_WM.nii.gz")).get_fdata()
+        CSF_mask = nib.load(os.path.join(out_dir, "Mask_CSF.nii.gz")).get_fdata()
+
+        GM = original_data * GM_mask
+        WM = original_data * WM_mask
+        CSF = original_data * CSF_mask
+        nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, "GM.nii.gz"))
+        nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, "WM.nii.gz"))
+        nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, "CSF.nii.gz"))
 
 
 #------------------------------
@@ -140,12 +206,12 @@ def plot_overlay(image1_path, image2_path, title):
     fixed_img = nib.load(image1_path).get_fdata()
     moving_img = nib.load(image2_path).get_fdata()
 
-    # Choose 12 evenly spaced slices along Z axis
+    # Choose evenly spaced slices along Z axis
     num_slices = 30
     z_slices = np.linspace(0, fixed_img.shape[2]-1, num_slices, dtype=int)
 
     # Plot grid
-    fig, axes = plt.subplots(5, 6, figsize=(8, 6))  # 3x4 grid
+    fig, axes = plt.subplots(5, 6, figsize=(8, 8))  # 3x4 grid
     axes = axes.flatten()
     fig.suptitle(title, fontsize=16)
 
@@ -153,11 +219,51 @@ def plot_overlay(image1_path, image2_path, title):
         fixed_slice = fixed_img[:, :, z]
         moving_slice = moving_img[:, :, z]
 
-        axes[i].imshow(fixed_slice, cmap="gray", origin="lower")
-        axes[i].contour(moving_slice, levels=[moving_slice.mean()], colors="red", linewidths=0.5)
+        axes[i].imshow(fixed_slice.T, cmap="gray", origin="lower")
+        axes[i].contour(moving_slice.T, levels=[moving_slice.mean()], colors="red", linewidths=0.5)
         axes[i].set_title(f"Slice {z}")
         axes[i].axis("off")
 
     plt.tight_layout()
     plt.show()
 
+#------------------------------
+# Visualize One Image
+#------------------------------import nibabel as nib
+
+def plot_image(image_path, title, is_segmented=False):
+    """
+    Visualizes an MRI image by displaying evenly spaced slices along the Z-axis.
+    For segmentation maps, uses FSL-like colors:
+        1=CSF (blue), 2=GM (red), 3=WM (green)
+    """
+    # Load image
+    img = nib.load(image_path).get_fdata()
+
+    # Choose 12 evenly spaced slices along Z axis
+    num_slices = 30
+    z_slices = np.linspace(0, img.shape[2]-1, num_slices, dtype=int)
+
+    # Plot grid
+    fig, axes = plt.subplots(5, 6, figsize=(8, 8))  # 3x4 grid
+    axes = axes.flatten()
+    fig.suptitle(title, fontsize=16)
+
+    # Define colormap if segmentation
+    if is_segmented:
+        # Map 0=black (background), 1=blue, 2=red, 3=green
+        cmap = ListedColormap(["black", "blue", "red", "green"])
+        bounds = np.arange(-0.5, 4.5)  # labels 0–3
+        norm = BoundaryNorm(bounds, cmap.N)
+    else:
+        cmap = "gray"
+        norm = None
+
+    for i, z in enumerate(z_slices):
+        slice_img = img[:, :, z]
+        axes[i].imshow(slice_img.T, cmap=cmap, norm=norm, origin="lower")
+        axes[i].set_title(f"Slice {z}")
+        axes[i].axis("off")
+
+    plt.tight_layout()
+    plt.show()
