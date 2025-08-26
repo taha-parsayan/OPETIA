@@ -41,9 +41,9 @@ app.resizable(False, False)
 """ GUI Elements Variables """
 
 var_mri_path = ctk.StringVar()
-var_mri_path.set("Enter path to T1.nii.gz")
+var_mri_path.set("Path to T1 or T2 or Flair.nii.gz")
 var_output_path = ctk.StringVar()
-var_output_path.set("Enter path to output folder")
+var_output_path.set("Path to OPETIA_output folder")
 var_mri_modality = ctk.StringVar()
 var_mri_modality.set("T1 weighted")
 var_reg_class = ctk.StringVar()
@@ -72,7 +72,7 @@ def get_address_folder():
 
 def set_MRI_address():
     address = get_address_file()
-    if address:
+    if os.path.exists(address):
         var_mri_path.set(address)
         T1_dir = os.path.dirname(address)
         output_address = os.path.join(T1_dir, "OPETIA_output")
@@ -82,7 +82,7 @@ def set_MRI_address():
 
 def set_output_address():
     address = get_address_folder()
-    if address:
+    if os.path.exists(address):
         var_output_path.set(address)
     else:
         messagebox.showinfo("Error...", "Invalid folder path!")
@@ -170,7 +170,7 @@ def btn_process_data():
     input_image = os.path.join(var_output_path.get(), f"{mri_modality}_brain.nii.gz")
     output_path = os.path.join(var_output_path.get(), f"{mri_modality}_brain_MNI.nii.gz")
     try:
-        ipf.register_to_MNI(input_image, output_path, registration_type)
+        ipf.register_to_MNI(input_image, output_path, registration_type, True)
         print("Registration to MNI152 space completed successfully.")
     except Exception as e:
         print(f"Error during Registration to MNI152 space:\n{e}")
