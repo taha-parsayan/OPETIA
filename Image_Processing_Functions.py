@@ -124,12 +124,16 @@ def split_tissues(image_path, image_modality, segmented_path, out_dir, Registere
 #------------------------------
 # Image registration to MNI Space
 #------------------------------
-def register_to_MNI(img_address, output_image_address, registration_type="SyN"):
+def register_to_MNI(img_address, output_image_address, registration_type="SyN", save_matrix=True):
     """
     Registers an image to MNI space and saves:
     - The warped image
-    - The transform files (affine + warp) as native_to_mni
+    - The transform files (affine + optional warp) as native_to_mni
     """
+
+    # Define linear and nonlinear types
+    linear_types = {"Translation", "Rigid", "Similarity", "Affine"}
+    nonlinear_types = {"SyN", "ElasticSyN", "SyNOnly", "SyNCC", "SyNRA", "SyNAggro", "SyNabp"}
 
     img = ants.image_read(img_address)
     current_dir = os.getcwd()
@@ -146,30 +150,40 @@ def register_to_MNI(img_address, output_image_address, registration_type="SyN"):
     ants.image_write(img_reg, output_image_address)
 
     # Save transforms
-    affine_transform = reg['fwdtransforms'][1] if len(reg['fwdtransforms']) > 1 else reg['fwdtransforms'][0]
-    warp_transform   = reg['fwdtransforms'][0] if len(reg['fwdtransforms']) > 1 else None
+    if save_matrix:
+        output_folder = os.path.dirname(output_image_address)
 
-    output_folder = os.path.dirname(output_image_address)
-    affine_out = os.path.join(output_folder, "native_to_mni_0GenericAffine.mat")
-    shutil.copy(affine_transform, affine_out)
+        if registration_type in linear_types:
+            # Only affine transform
+            affine_transform = reg['fwdtransforms'][0]
+            affine_out = os.path.join(output_folder, "native_to_mni_0GenericAffine.mat")
+            shutil.copy(affine_transform, affine_out)
 
-    if warp_transform:
-        warp_out = os.path.join(output_folder, "native_to_mni_1Warp.nii.gz")
-        shutil.copy(warp_transform, warp_out)
+        elif registration_type in nonlinear_types:
+            # Nonlinear → warp + affine
+            # Order in fwdtransforms: [warp, affine]
+            warp_transform   = reg['fwdtransforms'][0]
+            affine_transform = reg['fwdtransforms'][1]
 
+            warp_out = os.path.join(output_folder, "native_to_mni_1Warp.nii.gz")
+            affine_out = os.path.join(output_folder, "native_to_mni_0GenericAffine.mat")
+
+            shutil.copy(warp_transform, warp_out)
+            shutil.copy(affine_transform, affine_out)
 
 #------------------------------
 # Apply Transform to Image
 #------------------------------
-def apply_transform_to_image(img_address, output_address, transform_list):
+def apply_transform_to_image(img_address, output_address, transform_list, interpolation='multiLabel'):
     """
-    Applies a saved transform to an image.
+    Applies saved transform(s) to an image (works for both linear and nonlinear registrations).
 
     Parameters:
     - img_address: path to the moving image (e.g., segmentation in native space)
     - transform_list: list of transform file paths from registration (forward transforms)
+                      should be in ANTs fwdtransforms order: [warp (if any), affine]
     - output_address: path to save the transformed image
-    - interpolation: interpolation method ('nearestNeighbor' for labels, 'linear' for intensity)
+    - interpolation: 'multiLabel' for label maps, 'linear' for intensity images
     """
 
     current_dir = os.getcwd()
@@ -179,18 +193,23 @@ def apply_transform_to_image(img_address, output_address, transform_list):
     fixed_img = ants.image_read(MNI_path)
     moving_img = ants.image_read(img_address)
 
-    # Ensure transform_list is a list of strings (file paths)
-    transform_list = [str(t) for t in transform_list]
+    # Ensure transform_list is a list of strings
+    if isinstance(transform_list, str):
+        transform_list = [transform_list]
+    else:
+        transform_list = [str(t) for t in transform_list]
 
     # Apply transforms
     img_transformed = ants.apply_transforms(
         fixed=fixed_img,
         moving=moving_img,
         transformlist=transform_list,
-        interpolator='multiLabel')
+        interpolator=interpolation
+    )
 
     # Save the transformed image
     ants.image_write(img_transformed, output_address)
+
     
 #------------------------------
 # Visualize Image + overlay
