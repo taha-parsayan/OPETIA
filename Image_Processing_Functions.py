@@ -157,7 +157,7 @@ def add_PET_vols(path):
     """
 
     # Find and sort PET volumes
-    PET_volumes = sorted(fnmatch.filter(os.listdir(output_paths), 'vol*.nii.gz'))
+    PET_volumes = sorted(fnmatch.filter(os.listdir(path), 'vol*.nii.gz'))
 
     if not PET_volumes:
         raise ValueError("No PET volumes found in the folder!")
@@ -171,8 +171,30 @@ def add_PET_vols(path):
         static_vol += img  # element-wise addition
 
     # Save static PET volume
-    ants.image_write(static_vol, os.path.join(path, "PET_coreg.nii.gz"))
+    ants.image_write(static_vol, os.path.join(path, "pet_coreg.nii.gz"))
 
+
+#------------------------------
+# Applying a mask to an image
+#------------------------------
+def apply_mask(image_path, mask_path, output_path):
+    """
+    Apply a binary mask to an image and save the result.
+
+    Parameters:
+    - image_path: path to input image (.nii or .nii.gz)
+    - mask_path: path to binary mask (.nii or .nii.gz)
+    - output_path: path to save masked image
+    """
+    # Load image and mask
+    img = ants.image_read(image_path)
+    mask = ants.image_read(mask_path)
+
+    # Multiply image by mask
+    img_masked = img * mask
+
+    # Save masked image
+    ants.image_write(img_masked, output_path)
 
 
 #------------------------------

@@ -31,7 +31,7 @@ ctk.set_default_color_theme("blue")  # themes: "blue", "green", "dark-blue"
 # Create the app window
 app = ctk.CTk()  
 app.title("OPETIA - PET Image Processing")
-app.geometry("970x535")  # width x height
+app.geometry("970x560")  # width x height
 app.resizable(False, False)
 
 #------------------------------
@@ -50,6 +50,8 @@ var_smooth_FWHM = ctk.IntVar()
 var_smooth_FWHM.set(5)
 var_reg_type = ctk.StringVar()
 var_reg_type.set("Rigid-body (rotation + translation)")
+var_MRI_masks_folder = ctk.StringVar()
+var_MRI_masks_folder.set("Path to folder with MRI masks")
 
 """ Other Global Variables """
 registration_type = "Rigid"
@@ -74,6 +76,7 @@ def set_PET_folder():
         var_pet_path.set(folder_path)
         var_output_path.set(os.path.join(folder_path, "OPETIA_output"))
         var_MRI_reg_matrix_folder.set(var_output_path.get())
+        var_MRI_masks_folder.set(var_output_path.get())
     else:
         messagebox.showinfo("Error...", "Invalid folder path!")
 
@@ -90,6 +93,10 @@ def set_reg_matix_address():
         var_MRI_reg_matrix_folder.set(folder_path)
     else:
         messagebox.showinfo("Error...", "Invalid folder path!")
+
+def set_brain_mask_address():
+    path = get_address_file()
+    var_MRI_masks_folder.set(path)
 
 def set_reg_type(choice):
     registration_type = linear_options_dict[choice]
@@ -127,12 +134,42 @@ def btn_process_data():
         # Add coregistered vols to create PET.nii.gz
         ipf.add_PET_vols(var_output_path.get())
 
-
         print("Co-registration from PET to T1 space completed successfully.")
     except Exception as e:
-        print(f"Error during Registration to MNI152 space:\n{e}")
+        print(f"Error during co-registration to MNI152 space:\n{e}")
 
 
+    # Brain extraction
+    print("\n")
+    print("Skull stripping")
+    input_image = os.path.join(var_output_path.get(), "pet_coreg.nii.gz")
+    input_mask_folder = var_MRI_masks_folder.get()
+    input_mask = os.path.join(input_mask_folder, "t1_brain_mask.nii.gz")
+    output_image = os.path.join(var_output_path.get(), "pet_coreg_brain.nii.gz")
+    try:
+        ipf.apply_mask(input_image, input_mask, output_image)
+        print("Skull stripping completed successfully.")
+    except Exception as e:
+        print(f"Error during skull stripping:\n{e}")
+
+    # Tissue Segmentation
+    print("\n")
+    print("GM, WM, CSF segmentation in native space...")
+    input_image = os.path.join(var_output_path.get(), "pet_coreg_brain.nii.gz")
+    input_mask_GM = os.path.join(var_MRI_masks_folder.get(), "Mask_t1_GM_native.nii.gz")
+    input_mask_WM = os.path.join(var_MRI_masks_folder.get(), "Mask_t1_WM_native.nii.gz")
+    input_mask_CSF = os.path.join(var_MRI_masks_folder.get(), "Mask_t1_CSF_native.nii.gz")
+    output_GM = os.path.join(var_output_path.get(), "pet_GM_native.nii.gz")
+    output_WM = os.path.join(var_output_path.get(), "pet_WM_native.nii.gz")
+    output_CSF = os.path.join(var_output_path.get(), "pet_CSF_native.nii.gz")
+
+    try:
+        ipf.apply_mask(input_image, input_mask_GM, output_GM)
+        ipf.apply_mask(input_image, input_mask_WM, output_WM)
+        ipf.apply_mask(input_image, input_mask_CSF, output_CSF)
+        print("Segmentation completed successfully.") 
+    except Exception as e:
+        print(f"Error during PET segmentation:\n{e}")
 
     t2 = time.time()
     print("\nFinished processing.")
@@ -196,47 +233,56 @@ combobox1.place(x=5, y=35)
 #------------------------------
 # Frame 3: Registration matrix
 
-frame3 = ctk.CTkFrame(master=app, width=390, height=70, border_color="#ffffff", border_width=1)
+frame3 = ctk.CTkFrame(master=app, width=390, height=130, border_color="#ffffff", border_width=1)
 frame3.place(x=5, y=250)
 
-lable4 = ctk.CTkLabel(master=frame3, text="Folder containing MRI native-to-MNI registration matrix:", font=("Times New Roman", 15))
+lable4 = ctk.CTkLabel(master=frame3, text="Folder containing MRI brain masks:", font=("Times New Roman", 15))
 lable4.place(x=5, y=5)
 
-btn3 = ctk.CTkButton(master=frame3, text="Browse", width=100, height=25, command=set_reg_matix_address)
+btn3 = ctk.CTkButton(master=frame3, text="Browse", width=100, height=25, command=set_brain_mask_address)
 btn3.place(x=5, y=35)
 
-entry3 = ctk.CTkEntry(master=frame3, textvariable=var_MRI_reg_matrix_folder, width = 265, height=25)
+entry3 = ctk.CTkEntry(master=frame3, textvariable=var_MRI_masks_folder, width = 265, height=25)
 entry3.place(x=120, y=35)
+
+lable5 = ctk.CTkLabel(master=frame3, text="Folder containing MRI native-to-MNI registration matrix:", font=("Times New Roman", 15))
+lable5.place(x=5, y=65)
+
+btn4 = ctk.CTkButton(master=frame3, text="Browse", width=100, height=25, command=set_reg_matix_address)
+btn4.place(x=5, y=95)
+
+entry4 = ctk.CTkEntry(master=frame3, textvariable=var_MRI_reg_matrix_folder, width = 265, height=25)
+entry4.place(x=120, y=95)
 
 
 # ---------------------------
 # Frame4: smoothing
 frame4 = ctk.CTkFrame(master=app, width=390, height=35, border_color="#ffffff", border_width=1)
-frame4.place(x=5, y=330)
+frame4.place(x=5, y=390)
 
 check2 = ctk.CTkCheckBox(master=frame4, text="Gaussian smoothing with FWHM of",
                         command = var_check_smooth,
                         variable=var_check_smooth, font=("Times New Roman", 15))
 check2.place(x=5, y=5)
 
-entry3 = ctk.CTkEntry(master=frame4, textvariable=var_smooth_FWHM, width = 40, height=25)
-entry3.place(x=260, y=5)
+entry4 = ctk.CTkEntry(master=frame4, textvariable=var_smooth_FWHM, width = 40, height=25)
+entry4.place(x=260, y=5)
 
-lable5 = ctk.CTkLabel(master=frame4, text="mm", font=("Times New Roman", 15))
-lable5.place(x=305, y=5)
+lable6 = ctk.CTkLabel(master=frame4, text="mm", font=("Times New Roman", 15))
+lable6.place(x=305, y=5)
 
 
 #-------------------------------------
 # Processing buttons
 
-btn4 = ctk.CTkButton(master=app, text="Process data", width=390, height=25, command=btn_process_data)
-btn4.place(x=5, y=370)
+btn5 = ctk.CTkButton(master=app, text="Process data", width=390, height=25, command=btn_process_data)
+btn5.place(x=5, y=430)
 
-btn5 = ctk.CTkButton(master=app, text="Show registration result", width=390, height=25, command=btn_show_reg_result)
-btn5.place(x=5, y=400)
+btn6 = ctk.CTkButton(master=app, text="Show registration result", width=390, height=25, command=btn_show_reg_result)
+btn6.place(x=5, y=460)
 
-btn6 = ctk.CTkButton(master=app, text="Show segmentation results", width=390, height=25, command=btn_show_seg_result)
-btn6.place(x=5, y=430)
+btn7 = ctk.CTkButton(master=app, text="Show segmentation results", width=390, height=25, command=btn_show_seg_result)
+btn7.place(x=5, y=490)
 
 # Run the app
 app.mainloop()

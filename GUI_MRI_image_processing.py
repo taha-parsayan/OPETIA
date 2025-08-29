@@ -138,19 +138,19 @@ def btn_process_data():
 
     # Skull Stripping
     print("\n")
-    print("Skull Stripping...")
+    print("Skull stripping...")
 
     output_path = os.path.join(var_output_path.get(), f"{mri_modality}_brain.nii.gz")
     output_path_mask = os.path.join(var_output_path.get(), f"{mri_modality}_brain_mask.nii.gz")
     try:
         ipf.skull_strip(var_mri_path.get(), output_path, output_path_mask, mri_modality)
-        print("Skull Stripping completed successfully.")
+        print("Skull stripping completed successfully.")
     except Exception as e:
         print(f"Error during Skull Stripping:\n{e}")
 
     # Tissue Segmentation
     print("\n")
-    print("Tissue Segmentation in native space...")
+    print("GM, WM, CSF segmentation in native space...")
     input_image = os.path.join(var_output_path.get(), f"{mri_modality}_brain.nii.gz")
     brain_mask = os.path.join(var_output_path.get(), f"{mri_modality}_brain_mask.nii.gz")
     output_path = os.path.join(var_output_path.get(), f"{mri_modality}_brain_segmentation.nii.gz")
@@ -159,9 +159,9 @@ def btn_process_data():
         ipf.tissue_segmentation(input_image, brain_mask, output_path)
         ipf.split_tissues(input_image, mri_modality, segmented_image, var_output_path.get(), False)
 
-        print("Tissue Segmentation completed successfully.") 
+        print("Segmentation completed successfully.") 
     except Exception as e:
-        print(f"Error during Tissue Segmentation:\n{e}")
+        print(f"Error during tissue segmentation:\n{e}")
 
 
     # Registration to MNI space
@@ -189,7 +189,7 @@ def btn_process_data():
 
         print("Registration of Image segments to MNI152 space completed successfully.")
     except Exception as e:
-        print(f"Error during Registration of Image segments to MNI152 space:\n{e}")
+        print(f"Error during registration of image segments to MNI152 space:\n{e}")
 
 
 
