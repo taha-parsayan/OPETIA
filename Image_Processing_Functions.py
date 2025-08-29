@@ -12,6 +12,7 @@ import shutil
 import nibabel as nib
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
+import fnmatch
 
 #------------------------------
 # Skull Stripping using ANTsPyNet
@@ -119,6 +120,59 @@ def split_tissues(image_path, image_modality, segmented_path, out_dir, Registere
         nib.save(nib.Nifti1Image(GM, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_GM_native.nii.gz"))
         nib.save(nib.Nifti1Image(WM, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_WM_native.nii.gz"))
         nib.save(nib.Nifti1Image(CSF, original_img.affine, original_img.header), os.path.join(out_dir, f"{image_modality}_CSF_native.nii.gz"))
+
+
+#------------------------------
+# Image co-registration
+#------------------------------
+def co_registration(img_address, ref_address, output_image_address, registration_type="Rigid"):
+    """
+    Co-registers an image to another image
+    """
+
+    # Define linear and nonlinear types
+    # linear_types = {"Translation", "Rigid", "Similarity", "Affine"}
+    # nonlinear_types = {"SyN", "ElasticSyN", "SyNOnly", "SyNCC", "SyNRA", "SyNAggro", "SyNabp"}
+
+    img = ants.image_read(img_address)
+    ref = ants.image_read(ref_address)
+
+    reg = ants.registration(
+        fixed=ref,
+        moving=img,
+        type_of_transform="Rigid"
+    )
+
+    # Save warped image
+    img_reg = reg["warpedmovout"]
+    ants.image_write(img_reg, output_image_address)
+
+
+#------------------------------
+# Adding dynamic PET volumes
+#------------------------------
+def add_PET_vols(path):
+    """
+    Adds all PET dynamic volumes in a folder to create a static volume.
+    """
+
+    # Find and sort PET volumes
+    PET_volumes = sorted(fnmatch.filter(os.listdir(output_paths), 'vol*.nii.gz'))
+
+    if not PET_volumes:
+        raise ValueError("No PET volumes found in the folder!")
+
+    # Read first image to initialize sum
+    static_vol = ants.image_read(os.path.join(path, PET_volumes[0]))
+
+    # Add remaining volumes
+    for vol_name in PET_volumes[1:]:
+        img = ants.image_read(os.path.join(path, vol_name))
+        static_vol += img  # element-wise addition
+
+    # Save static PET volume
+    ants.image_write(static_vol, os.path.join(path, "PET_coreg.nii.gz"))
+
 
 
 #------------------------------
