@@ -286,7 +286,24 @@ def apply_transform_to_image(img_address, output_address, transform_list, interp
     # Save the transformed image
     ants.image_write(img_transformed, output_address)
 
+
+#------------------------------
+# Smoothing an Image
+#------------------------------
+
+def smooth_image(input_path, output_path, fwhm=5):
+    # Read image
+    img = ants.image_read(input_path)
     
+    # Convert FWHM to sigma (σ = FWHM / 2.355)
+    sigma = fwhm / 2.355
+    
+    # Smooth
+    smoothed_img = ants.smooth_image(img, sigma=sigma, sigma_in_physical_coordinates=True)
+    
+    # Save
+    ants.image_write(smoothed_img, output_path)
+
 #------------------------------
 # Visualize Image + overlay
 #------------------------------
@@ -323,7 +340,7 @@ def plot_overlay(image1_path, image2_path, title):
 
 #------------------------------
 # Visualize One Image
-#------------------------------import nibabel as nib
+#------------------------------
 
 def plot_image(image_path, title, is_segmented=False):
     """
@@ -356,6 +373,49 @@ def plot_image(image_path, title, is_segmented=False):
     for i, z in enumerate(z_slices):
         slice_img = img[:, :, z]
         axes[i].imshow(slice_img.T, cmap=cmap, norm=norm, origin="lower")
+        axes[i].set_title(f"Slice {z}")
+        axes[i].axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+#------------------------------
+# Visualize Three Images
+#------------------------------
+
+def plot_3_images_overlay(img1_path, img2_path, img3_path, title, num_slices=30):
+    """
+    Visualizes 3 MRI/PET images overlaid in RGB colors on evenly spaced slices.
+    - img1 → Red
+    - img2 → Green
+    - img3 → Blue
+    """
+    # Load images
+    img1 = nib.load(img1_path).get_fdata()
+    img2 = nib.load(img2_path).get_fdata()
+    img3 = nib.load(img3_path).get_fdata()
+
+    # Ensure same shape
+    if not (img1.shape == img2.shape == img3.shape):
+        raise ValueError("All images must have the same shape!")
+
+    # Choose slices along Z
+    z_slices = np.linspace(0, img1.shape[2] - 1, num_slices, dtype=int)
+
+    # Plot grid
+    fig, axes = plt.subplots(5, 6, figsize=(8, 8))
+    axes = axes.flatten()
+    fig.suptitle(title, fontsize=16)
+
+    for i, z in enumerate(z_slices):
+        slice1 = img1[:, :, z]
+        slice2 = img2[:, :, z]
+        slice3 = img3[:, :, z]
+
+        # Stack into RGB (R=img1, G=img2, B=img3)
+        rgb_slice = np.stack([slice1, slice2, slice3], axis=-1)
+
+        axes[i].imshow(rgb_slice.T, origin="lower")
         axes[i].set_title(f"Slice {z}")
         axes[i].axis("off")
 

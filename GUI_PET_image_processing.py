@@ -141,7 +141,7 @@ def btn_process_data():
 
     # Brain extraction
     print("\n")
-    print("Skull stripping")
+    print("Skull stripping...")
     input_image = os.path.join(var_output_path.get(), "pet_coreg.nii.gz")
     input_mask_folder = var_MRI_masks_folder.get()
     input_mask = os.path.join(input_mask_folder, "t1_brain_mask.nii.gz")
@@ -152,10 +152,23 @@ def btn_process_data():
     except Exception as e:
         print(f"Error during skull stripping:\n{e}")
 
+
+    # Smoothing the image in native space
+    print("\n")
+    print("Smoothing the image in native space...")
+    input_image = os.path.join(var_output_path.get(), "pet_coreg_brain.nii.gz")
+    output_image = os.path.join(var_output_path.get(), "pet_coreg_brain_smooth.nii.gz")
+    fwhm = var_smooth_FWHM.get()
+    try:
+        ipf.smooth_image(input_image, output_image, fwhm)
+        print("Smoothing completed successfully.")
+    except Exception as e:
+        print(f"Error during smoothing in native space:\n{e}")
+
     # Tissue Segmentation
     print("\n")
     print("GM, WM, CSF segmentation in native space...")
-    input_image = os.path.join(var_output_path.get(), "pet_coreg_brain.nii.gz")
+    input_image = os.path.join(var_output_path.get(), "pet_coreg_brain_smooth.nii.gz")
     input_mask_GM = os.path.join(var_MRI_masks_folder.get(), "Mask_t1_GM_native.nii.gz")
     input_mask_WM = os.path.join(var_MRI_masks_folder.get(), "Mask_t1_WM_native.nii.gz")
     input_mask_CSF = os.path.join(var_MRI_masks_folder.get(), "Mask_t1_CSF_native.nii.gz")
@@ -171,15 +184,93 @@ def btn_process_data():
     except Exception as e:
         print(f"Error during PET segmentation:\n{e}")
 
+    # Registration to MNI
+    print("\n")
+    print("Image registration to MNI152 space...")
+    input_image = os.path.join(var_output_path.get(), "pet_coreg_brain.nii.gz")
+    output_path = os.path.join(var_output_path.get(), "pet_coreg_brain_MNI.nii.gz")
+
+    if os.path.exists(os.path.join(var_output_path.get(), "native_to_mni_1Warp.nii.gz")):
+        # Registration was nonlinear
+        transform_list = [os.path.join(var_output_path.get(), "native_to_mni_1Warp.nii.gz"), os.path.join(var_output_path.get(), "native_to_mni_0GenericAffine.mat")]
+    else:
+        # Registration was linear
+        transform_list = os.path.join(var_output_path.get(), "native_to_mni_0GenericAffine.mat")
+
+    try:
+        ipf.apply_transform_to_image(input_image, output_path, transform_list)
+        print("Registration of Image to MNI152 space completed successfully.")
+    except Exception as e:
+        print(f"Error during registration of image to MNI152 space:\n{e}")
+
+    # Smoothing the image in MNI space
+    print("\n")
+    print("Smoothing the image in MNI152 space...")
+    input_image = os.path.join(var_output_path.get(), "pet_coreg_brain_MNI.nii.gz")
+    output_image = os.path.join(var_output_path.get(), "pet_coreg_brain_MNI_smooth.nii.gz")
+    fwhm = var_smooth_FWHM.get()
+    try:
+        ipf.smooth_image(input_image, output_image, fwhm)
+        print("Smoothing completed successfully.")
+    except Exception as e:
+        print(f"Error during smoothing in MNI space:\n{e}")
+    
+    # Tissue segmentation in MNI
+    print("\n")
+    print("GM, WM, CSF segmentation in MNI152 space...")
+    input_PET = os.path.join(var_output_path.get(), "pet_coreg_brain_MNI_smooth.nii.gz")
+    # Need to check which MRI modality was used
+    if os.path.exists(os.path.join(var_output_path.get(), "Mask_t1_GM_MNI.nii.gz")):
+        # T1 modality
+        mask_GM = os.path.join(var_output_path.get(), "Mask_t1_GM_MNI.nii.gz")
+        mask_WM = os.path.join(var_output_path.get(), "Mask_t1_WM_MNI.nii.gz")
+        mask_CSF = os.path.join(var_output_path.get(), "Mask_t1_CSF_MNI.nii.gz")
+    elif os.path.exists(os.path.join(var_output_path.get(), "Mask_t2_GM_MNI.nii.gz")):
+        # T2 modality
+        mask_GM = os.path.join(var_output_path.get(), "Mask_t2_GM_MNI.nii.gz")
+        mask_WM = os.path.join(var_output_path.get(), "Mask_t2_WM_MNI.nii.gz")
+        mask_CSF = os.path.join(var_output_path.get(), "Mask_t2_CSF_MNI.nii.gz")
+    else:    
+        # Flair modality
+        mask_GM = os.path.join(var_output_path.get(), "Mask_flair_GM_MNI.nii.gz")
+        mask_WM = os.path.join(var_output_path.get(), "Mask_flair_WM_MNI.nii.gz")
+        mask_CSF = os.path.join(var_output_path.get(), "Mask_flair_CSF_MNI.nii.gz")
+    out_GM = os.path.join(var_output_path.get(), "pet_GM_MNI.nii.gz")
+    out_WM = os.path.join(var_output_path.get(), "pet_WM_MNI.nii.gz")
+    out_CSF = os.path.join(var_output_path.get(), "pet_CSF_MNI.nii.gz")
+
+    try:
+        ipf.apply_mask(input_PET, mask_GM, out_GM)
+        ipf.apply_mask(input_PET, mask_WM, out_WM)
+        ipf.apply_mask(input_PET, mask_CSF, out_CSF)
+        print("Registration of Image segments to MNI152 space completed successfully.")
+    except Exception as e:
+        print(f"Error during registration of image segments to MNI152 space:\n{e}")
+
+
     t2 = time.time()
     print("\nFinished processing.")
     print(f"Total time: {(t2-t1)/60:.2f} minutes")
 
+
+
 def btn_show_reg_result():
-    pass
+    try:
+        MNI_path = os.path.join(os.getcwd(), "Templates/MNI152_T1_2mm_brain.nii.gz")
+        reg_img_path = os.path.join(var_output_path.get(), "pet_coreg_brain_MNI.nii.gz")
+        ipf.plot_overlay(MNI_path, reg_img_path, "Registration Result: MNI (background) and PET (overlay)")
+    except Exception as e:
+        print(f"Error displaying registration result:\n{e}")
 
 def btn_show_seg_result():
-    pass
+    try:
+        gm_path = os.path.join(var_output_path.get(), "pet_GM_MNI.nii.gz")
+        wm_path = os.path.join(var_output_path.get(), "pet_WM_MNI.nii.gz")
+        csf_path = os.path.join(var_output_path.get(), "pet_CSF_MNI.nii.gz")
+        ipf.plot_3_images_overlay(gm_path, wm_path, csf_path, 
+                                  "Tissue Segmentation Result in MNI space")
+    except Exception as e:
+        print(f"Error displaying segmentation result:\n{e}")
 #------------------------------
 # GUI Elements
 #------------------------------

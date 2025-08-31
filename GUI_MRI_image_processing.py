@@ -180,8 +180,13 @@ def btn_process_data():
     print("Registration of image segments from native to MNI152 space...")
     input_image = os.path.join(var_output_path.get(), f"{mri_modality}_brain_segmentation.nii.gz")
     output_path = os.path.join(var_output_path.get(), f"{mri_modality}_brain_segmentation_MNI.nii.gz")
-    transform_list = [os.path.join(var_output_path.get(), "native_to_mni_1Warp.nii.gz"), os.path.join(var_output_path.get(), "native_to_mni_0GenericAffine.mat")]
     MRI_MNI = os.path.join(var_output_path.get(), f"{mri_modality}_brain_MNI.nii.gz")
+    if os.path.exists(os.path.join(var_output_path.get(), "native_to_mni_1Warp.nii.gz")):
+        # Registration was nonlinear
+        transform_list = [os.path.join(var_output_path.get(), "native_to_mni_1Warp.nii.gz"), os.path.join(var_output_path.get(), "native_to_mni_0GenericAffine.mat")]
+    else:
+        # Registration was linear
+        transform_list = os.path.join(var_output_path.get(), "native_to_mni_0GenericAffine.mat")
 
     try:
         ipf.apply_transform_to_image(input_image, output_path, transform_list)
@@ -201,14 +206,14 @@ def btn_process_data():
 def btn_show_reg_result():
     try:
         mni_img_path = os.path.join(os.getcwd(), "Templates/MNI152_T1_2mm_brain.nii.gz")
-        reg_img_path = os.path.join(var_output_path.get(), "T1_brain_MNI.nii.gz")
+        reg_img_path = os.path.join(var_output_path.get(), "t1_brain_MNI.nii.gz")
         ipf.plot_overlay(mni_img_path, reg_img_path, "Registration Result: MNI (background) and T1 (overlay)")
     except Exception as e:
         print(f"Error displaying registration result:\n{e}")
 
 def btn_show_seg_result():
     try:
-        seg_img_path = os.path.join(var_output_path.get(), "T1_brain_segmentation_MNI.nii.gz")
+        seg_img_path = os.path.join(var_output_path.get(), "t1_brain_segmentation_MNI.nii.gz")
         ipf.plot_image(seg_img_path, "Tissue Segmentation Result in MNI space", is_segmented=True)
     except Exception as e:
         print(f"Error displaying segmentation result:\n{e}")
