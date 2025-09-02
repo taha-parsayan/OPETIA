@@ -13,6 +13,8 @@ import nibabel as nib
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import fnmatch
+import math
+
 
 #------------------------------
 # Skull Stripping using ANTsPyNet
@@ -61,6 +63,7 @@ def tissue_segmentation(img_address, brain_mask_address, output_address):
 #------------------------------
 # Split GM, WM, CSF from Segmentation
 #------------------------------
+
 def split_tissues(image_path, image_modality, segmented_path, out_dir, Registered):
     """
     Split a segmented T1 image into GM, WM, CSF masks.
@@ -149,7 +152,7 @@ def co_registration(img_address, ref_address, output_image_address, registration
 
 
 #------------------------------
-# Adding dynamic PET volumes
+# Adding coregistered PET volumes to make a static
 #------------------------------
 def add_PET_vols(path):
     """
@@ -157,7 +160,7 @@ def add_PET_vols(path):
     """
 
     # Find and sort PET volumes
-    PET_volumes = sorted(fnmatch.filter(os.listdir(path), 'vol*.nii.gz'))
+    PET_volumes = sorted(fnmatch.filter(os.listdir(path), 'vol*_coreg.nii.gz'))
 
     if not PET_volumes:
         raise ValueError("No PET volumes found in the folder!")
@@ -304,6 +307,39 @@ def smooth_image(input_path, output_path, fwhm=5):
     # Save
     ants.image_write(smoothed_img, output_path)
 
+
+#------------------------------
+# Splitting Dynanic PET Into Volumes
+#------------------------------
+
+
+def split_dynamic_pet(input_path, output_dir, prefix="vol"):
+    """
+    Split a 4D dynamic PET NIfTI file into multiple 3D volumes,
+    preserving the original affine and header for alignment.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Load the 4D PET image
+    img = nib.load(input_path)
+    data = img.get_fdata() # converts the NIfTI image into a NumPy array
+    affine = img.affine # The affine matrix is a 4×4 matrix that maps voxel coordinates to real-world coordinates (usually in millimeters)
+    header = img.header # The header contains metadata about the image
+
+    # Check if the image is 4D
+    if len(data.shape) != 4:
+        # Only one volume, save as vol0000
+        output_path = os.path.join(output_dir, "vol0000.nii.gz")
+        nib.save(nib.Nifti1Image(data, affine, header), output_path)
+        return
+
+    # Split into frames
+    for t in range(data.shape[3]):
+        vol_data = data[..., t]  # extract 3D frame
+        output_path = os.path.join(output_dir, f"{prefix}{t:04d}.nii.gz")
+        # Use original affine and header to preserve alignment
+        nib.save(nib.Nifti1Image(vol_data, affine, header), output_path)
+
 #------------------------------
 # Visualize Image + overlay
 #------------------------------
@@ -389,7 +425,10 @@ def plot_3_images_overlay(img1_path, img2_path, img3_path, title, num_slices=30)
     - img1 → Red
     - img2 → Green
     - img3 → Blue
+
+    Rotates each slice 90 degrees for proper brain orientation.
     """
+
     # Load images
     img1 = nib.load(img1_path).get_fdata()
     img2 = nib.load(img2_path).get_fdata()
@@ -397,15 +436,31 @@ def plot_3_images_overlay(img1_path, img2_path, img3_path, title, num_slices=30)
 
     # Ensure same shape
     if not (img1.shape == img2.shape == img3.shape):
-        raise ValueError("All images must have the same shape!")
+        raise ValueError(f"All images must have the same shape! Got {img1.shape}, {img2.shape}, {img3.shape}")
 
-    # Choose slices along Z
-    z_slices = np.linspace(0, img1.shape[2] - 1, num_slices, dtype=int)
+    # Reorder axes if needed so last dimension is Z (slices)
+    if img1.shape[2] < img1.shape[0] and img1.shape[2] < img1.shape[1]:
+        img1 = np.transpose(img1, (1, 2, 0))
+        img2 = np.transpose(img2, (1, 2, 0))
+        img3 = np.transpose(img3, (1, 2, 0))
 
-    # Plot grid
-    fig, axes = plt.subplots(5, 6, figsize=(8, 8))
+    # Determine which slices to show along Z
+    z_slices = np.linspace(0, img1.shape[2] - 1, min(num_slices, img1.shape[2]), dtype=int)
+
+    # Compute grid layout
+    n_slices = len(z_slices)
+    n_cols = min(6, n_slices)
+    n_rows = math.ceil(n_slices / n_cols)
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(8, 8))
     axes = axes.flatten()
     fig.suptitle(title, fontsize=16)
+
+    # Normalize helper
+    def normalize(slice):
+        slice_min = slice.min()
+        slice_max = slice.max()
+        return (slice - slice_min) / (slice_max - slice_min + 1e-8)
 
     for i, z in enumerate(z_slices):
         slice1 = img1[:, :, z]
@@ -413,11 +468,21 @@ def plot_3_images_overlay(img1_path, img2_path, img3_path, title, num_slices=30)
         slice3 = img3[:, :, z]
 
         # Stack into RGB (R=img1, G=img2, B=img3)
-        rgb_slice = np.stack([slice1, slice2, slice3], axis=-1)
+        rgb_slice = np.stack([normalize(slice1),
+                              normalize(slice2),
+                              normalize(slice3)], axis=-1)
 
-        axes[i].imshow(rgb_slice.T, origin="lower")
+        # Rotate 90 degrees
+        rgb_slice_rot = np.rot90(rgb_slice, k=3) # 270 degree rotation
+
+        axes[i].imshow(rgb_slice_rot, origin="lower")
         axes[i].set_title(f"Slice {z}")
         axes[i].axis("off")
 
+    # Turn off unused axes
+    for ax in axes[n_slices:]:
+        ax.axis("off")
+
     plt.tight_layout()
     plt.show()
+

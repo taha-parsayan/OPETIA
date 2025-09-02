@@ -19,6 +19,7 @@ import time
 import shutil
 from PIL import Image
 import fnmatch
+import re
 
 #------------------------------
 # GUI Setup
@@ -39,7 +40,7 @@ app.resizable(False, False)
 #------------------------------
 """ GUI Element variables """
 var_pet_path = ctk.StringVar()
-var_pet_path.set("Path to vol0000.nii.gz, vol0001.nii.gz, ...")
+var_pet_path.set("Path PET.nii.gz")
 var_output_path = ctk.StringVar()
 var_output_path.set("Path to OPETIA_output folder")
 var_MRI_reg_matrix_folder = ctk.StringVar()
@@ -71,10 +72,11 @@ def get_address_folder():
     return filedialog.askdirectory()
 
 def set_PET_folder():
-    folder_path = get_address_folder()
-    if os.path.exists(folder_path):
-        var_pet_path.set(folder_path)
-        var_output_path.set(os.path.join(folder_path, "OPETIA_output"))
+    PET_dynamic_path = get_address_file()
+    if os.path.exists(PET_dynamic_path):
+        var_pet_path.set(PET_dynamic_path)
+        dir = os.path.dirname(PET_dynamic_path)
+        var_output_path.set(os.path.join(dir, "OPETIA_output"))
         var_MRI_reg_matrix_folder.set(var_output_path.get())
         var_MRI_masks_folder.set(var_output_path.get())
     else:
@@ -110,23 +112,42 @@ def btn_process_data():
     print("\n")
     print("____________OPETIA is Processing your data___________")
 
+    # First need to split the dynamic PET into volumes
+    print("\n")
+    print("Splitting the dynamic PET into its volumes...")
+
+    input_PET_dynamic = var_pet_path.get()
+    output_dir = var_output_path.get()
+    try:
+        ipf.split_dynamic_pet(input_PET_dynamic, output_dir)
+        print("Dynamic PET volume splitting completed successfully.")
+    except Exception as e:
+        print(f"Error during splitting the dynamic PET:\n{e}")
+    
     # Co-registering PET vols to T1
     # Here images still have the skull
     print("\n")
     print("Coregistering PET volumes to T1 space...")
 
+    # Read the volumes
     def find_PET_volumes(path):
-        return sorted(fnmatch.filter(os.listdir(path), 'vol*.nii.gz'))
+        """
+        Find only PET volumes with names like vol0000.nii.gz, vol0001.nii.gz, etc.
+        Ignores files like vol0000_coreg.nii.gz.
+        """
+        pattern = re.compile(r"^vol\d{4}\.nii\.gz$")  # exactly vol + 4 digits + .nii.gz
+        return sorted([f for f in os.listdir(path) if pattern.match(f)])
 
-    pet_vols = find_PET_volumes(var_pet_path.get())
+    pet_vols = find_PET_volumes(var_output_path.get())
     n = len(pet_vols)
     print(f"{n} PET volumes were found.")
 
     try:
         # Coregister PET to T1
         for vol_names in pet_vols:
-            input_image = os.path.join(var_pet_path.get(), f"{vol_names}")
-            ref_image = os.path.join(var_pet_path.get(), "T1.nii.gz")
+            input_image = os.path.join(var_output_path.get(), f"{vol_names}")
+            dir = os.path.dirname(var_pet_path.get()) # Where T1.nii.gz is located
+            ref_image = os.path.join(dir, "T1.nii.gz")
             output_name = vol_names.replace(".nii.gz", "") # So that I can add stuff to the sequel of the file name
             output_path = os.path.join(var_output_path.get(), f"{output_name}_coreg.nii.gz")
             ipf.co_registration(input_image, ref_image, output_path, registration_type)
