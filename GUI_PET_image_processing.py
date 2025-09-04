@@ -32,7 +32,7 @@ ctk.set_default_color_theme("blue")  # themes: "blue", "green", "dark-blue"
 # Create the app window
 app = ctk.CTk()  
 app.title("OPETIA - PET Image Processing")
-app.geometry("970x560")  # width x height
+app.geometry("1360x645")  # width x height
 app.resizable(False, False)
 
 #------------------------------
@@ -40,7 +40,7 @@ app.resizable(False, False)
 #------------------------------
 """ GUI Element variables """
 var_pet_path = ctk.StringVar()
-var_pet_path.set("Path PET.nii.gz")
+var_pet_path.set("Path to PET_dynamic.nii.gz")
 var_output_path = ctk.StringVar()
 var_output_path.set("Path to OPETIA_output folder")
 var_MRI_reg_matrix_folder = ctk.StringVar()
@@ -295,6 +295,18 @@ def btn_show_seg_result():
 #------------------------------
 # GUI Elements
 #------------------------------
+
+# Pipeline image
+current_dir = os.getcwd()
+pipeline_image_path = os.path.join(current_dir, "Images", "PET_proc_pipeline.png")
+pipeline_image = Image.open(pipeline_image_path)
+w, h = pipeline_image.size  
+scale_factor = 0.6
+new_w, new_h = int(w * scale_factor), int(h * scale_factor)
+pipeline_image = pipeline_image.resize((new_w, new_h), Image.LANCZOS)
+ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(new_w, new_h))
+label_image = ctk.CTkLabel(master=app, image=ctk_image, text="")
+label_image.place(x=410, y=5)
 
 # Frame1: input paths
 
