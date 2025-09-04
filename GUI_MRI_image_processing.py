@@ -30,7 +30,7 @@ ctk.set_default_color_theme("blue")  # themes: "blue", "green", "dark-blue"
 # Create the app window
 app = ctk.CTk()  
 app.title("OPETIA - MRI Image Processing")
-app.geometry("970x475")  # width x height
+app.geometry("995x472")  # width x height
 app.resizable(False, False)
 
 
@@ -226,7 +226,11 @@ def btn_show_seg_result():
 current_dir = os.getcwd()
 pipeline_image_path = os.path.join(current_dir, "Images", "MRI_proc_pipeline.png")
 pipeline_image = Image.open(pipeline_image_path)
-ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(550, 460))
+w, h = pipeline_image.size  
+scale_factor = 0.42
+new_w, new_h = int(w * scale_factor), int(h * scale_factor)
+pipeline_image = pipeline_image.resize((new_w, new_h), Image.LANCZOS)
+ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(new_w, new_h))
 label_image = ctk.CTkLabel(master=app, image=ctk_image, text="")
 label_image.place(x=410, y=5)
 
