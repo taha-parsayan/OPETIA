@@ -172,16 +172,6 @@ class MRIPanel:
             self.var_output_path.set(address)
         else:
             messagebox.showinfo("Error...", "Invalid folder path!")
-
-    # -------------------------------
-    # For logging
-    # -------------------------------
-    def log(self, message: str):
-        """Print a message to the panel's log box."""
-        self.print_box.configure(state="normal")
-        self.print_box.insert("end", message + "\n")
-        self.print_box.see("end")  # auto-scroll
-        self.print_box.configure(state="disabled")
     
     # -------------------------------
     # Modality & registration methods
@@ -208,6 +198,16 @@ class MRIPanel:
             self.registration_type = self.linear_options_dict.get(registration_type, "Affine")
         else:
             self.registration_type = self.nonlinear_options_dict.get(registration_type, "SyN")
+
+    # -------------------------------
+    # For logging
+    # -------------------------------
+    def log(self, message: str):
+        """Print a message to the panel's log box."""
+        self.print_box.configure(state="normal")
+        self.print_box.insert("end", message + "\n")
+        self.print_box.see("end")  # auto-scroll
+        self.print_box.configure(state="disabled")
 
     # -------------------------------
     # Processing methods
@@ -299,23 +299,3 @@ class MRIPanel:
         except Exception as e:
             self.log(f"Error displaying segmentation result:\n{e}")
             return
-
-
-# -------------------------------
-# Log class
-# -------------------------------
-"""
-It is aseparate class to print the output log inside the log box in GUI
-"""
-class StdoutRedirector:
-    def __init__(self, textbox):
-        self.textbox = textbox
-
-    def write(self, string):
-        self.textbox.configure(state="normal")
-        self.textbox.insert("end", string)
-        self.textbox.see("end")  # Auto-scroll
-        self.textbox.configure(state="disabled")
-
-    def flush(self):
-        pass

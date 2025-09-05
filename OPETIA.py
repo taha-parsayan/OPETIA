@@ -16,6 +16,7 @@ from PIL import Image
 import Image_Processing_Functions as ipf
 from MRI_Panel import MRIPanel
 from PET_Panel import PETPanel
+from tkinter import PhotoImage
 
 #------------------------------
 # GUI Setup
@@ -31,6 +32,17 @@ app.title("OPETIA")
 app.state("zoomed") # Full screen
 app.resizable(True, True)
 
+# Set the taskbar icon (Windows)
+current_dir = os.getcwd()
+icon_png = os.path.join(current_dir, "Images", "Icon.png")   # PNG for Mac/Linux
+icon_ico = os.path.join(current_dir, "Images", "Icon.ico")   # ICO for Windows
+# Windows: .ico
+if os.name == "nt" and os.path.exists(icon_ico):
+    app.wm_iconbitmap(icon_ico)
+# macOS/Linux: PNG
+if os.path.exists(icon_png):
+    icon_img = PhotoImage(file=icon_png)
+    app.iconphoto(True, icon_img)
 #------------------------------
 # Functions
 #------------------------------
