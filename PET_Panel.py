@@ -35,7 +35,7 @@ class PETPanel:
         self.var_MRI_reg_matrix_folder = ctk.StringVar(value="Path to folder with registration matrix")
         self.var_MRI_masks_folder = ctk.StringVar(value="Path to folder with MRI masks")
         self.var_check_smooth = ctk.BooleanVar(value=True)
-        self.var_smooth_FWHM = ctk.StringVar(value="5")
+        self.var_smooth_FWHM = ctk.IntVar(value=5)
         self.var_reg_type = ctk.StringVar(value="Rigid-body (rotation + translation)")
 
         # Default config
