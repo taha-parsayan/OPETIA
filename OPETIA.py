@@ -7,8 +7,15 @@ Author: Taha Parsayan
 # Import Libraries
 #------------------------------
 import os
+import time
+import shutil
 import customtkinter as ctk
+from tkinter import filedialog
+import tkinter.messagebox as messagebox
 from PIL import Image
+import Image_Processing_Functions as ipf
+from MRI_Panel import MRIPanel
+from PET_Panel import PETPanel
 
 #------------------------------
 # GUI Setup
@@ -20,7 +27,8 @@ ctk.set_default_color_theme("blue")
 # Main window
 app = ctk.CTk()
 app.title("OPETIA")
-app.geometry("900x600")  # bigger window with left+right panels
+# app.geometry("900x600")
+app.state("zoomed") # Full screen
 app.resizable(True, True)
 
 #------------------------------
@@ -28,7 +36,7 @@ app.resizable(True, True)
 #------------------------------
 
 def show_panel(panel_name):
-    """Show the selected panel on the right side."""
+    """Shows the selected panel on the right side."""
     for panel in panels.values():
         panel.pack_forget()   # hide all panels
     panels[panel_name].pack(fill="both", expand=True, padx=10, pady=10)
@@ -38,11 +46,11 @@ def show_panel(panel_name):
 #------------------------------
 
 # Left navigation panel
-left_panel = ctk.CTkFrame(app, width=200)
+left_panel = ctk.CTkFrame(app, width=200, fg_color="white")
 left_panel.pack(side="left", fill="y")
 
 # Right content panel (container for switching content)
-right_panel = ctk.CTkFrame(app)
+right_panel = ctk.CTkFrame(app, fg_color="black")
 right_panel.pack(side="right", fill="both", expand=True)
 
 #------------------------------
@@ -59,17 +67,17 @@ new_w, new_h = int(w*scale_factor), int(h*scale_factor)
 logo_img = logo_img.resize((new_w, new_h), Image.LANCZOS)
 logo_img = ctk.CTkImage(dark_image=logo_img, size=(new_w, new_h))
 logo_label = ctk.CTkLabel(master=left_panel, image=logo_img, text="")
-logo_label.pack(pady=20)
+logo_label.pack(padx=20, pady=20)
 
 # Navigation buttons
-btn1 = ctk.CTkButton(master=left_panel, text="MRI Image Processing", command=lambda: show_panel("mri"))
-btn1.pack(pady=10)
+btn1 = ctk.CTkButton(master=left_panel, text="MRI Image Processing", fg_color="black", command=lambda: show_panel("mri"))
+btn1.pack(padx=10, pady=5)
 
-btn2 = ctk.CTkButton(master=left_panel, text="PET Image Processing", command=lambda: show_panel("pet"))
-btn2.pack(pady=10)
+btn2 = ctk.CTkButton(master=left_panel, text="PET Image Processing", fg_color="black", command=lambda: show_panel("pet"))
+btn2.pack(padx=10,pady=5)
 
-btn3 = ctk.CTkButton(master=left_panel, text="ROI Feature Extraction", command=lambda: show_panel("roi"))
-btn3.pack(pady=10)
+btn3 = ctk.CTkButton(master=left_panel, text="ROI Feature Extraction", fg_color="black", command=lambda: show_panel("roi"))
+btn3.pack(padx=10,pady=5)
 
 #------------------------------
 # Right Panel Pages
@@ -79,11 +87,11 @@ panels = {}
 
 # MRI panel
 panels["mri"] = ctk.CTkFrame(right_panel)
-ctk.CTkLabel(panels["mri"], text="MRI Image Processing Panel", font=("Arial", 18)).pack(pady=20)
+MRIPanel(panels["mri"])  
 
 # PET panel
 panels["pet"] = ctk.CTkFrame(right_panel)
-ctk.CTkLabel(panels["pet"], text="PET Image Processing Panel", font=("Arial", 18)).pack(pady=20)
+PETPanel(panels["pet"]) 
 
 # ROI panel
 panels["roi"] = ctk.CTkFrame(right_panel)
