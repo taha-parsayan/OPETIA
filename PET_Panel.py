@@ -25,6 +25,9 @@ class PETPanel:
         self.parent = parent
         self._setup_variables()
         self._build_gui()
+        # Lets print something to start
+        print("OPETIA is ready to analyze your data!")
+        print("Analyze log will be printed here.")
 
     # -------------------------------
     # Variables
@@ -256,7 +259,7 @@ class PETPanel:
         print("\nGM, WM, CSF segmentation in native space...")
         input_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain_smooth.nii.gz")
         input_mask_GM = os.path.join(self.var_MRI_masks_folder.get(), "Mask_t1_GM_native.nii.gz")
-        input_mask_WM = os.path.join(vself.ar_MRI_masks_folder.get(), "Mask_t1_WM_native.nii.gz")
+        input_mask_WM = os.path.join(self.var_MRI_masks_folder.get(), "Mask_t1_WM_native.nii.gz")
         input_mask_CSF = os.path.join(self.var_MRI_masks_folder.get(), "Mask_t1_CSF_native.nii.gz")
         output_GM = os.path.join(self.var_output_path.get(), "pet_GM_native.nii.gz")
         output_WM = os.path.join(self.var_output_path.get(), "pet_WM_native.nii.gz")

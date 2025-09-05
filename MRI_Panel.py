@@ -26,6 +26,10 @@ class MRIPanel:
         self.parent = parent
         self._setup_variables()
         self._build_gui()
+        # Lets print something to start
+        print("OPETIA is ready to analyze your data!")
+        print("Analyze log will be printed here.")
+
 
     # -------------------------------
     # Variables
