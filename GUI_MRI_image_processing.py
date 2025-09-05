@@ -213,7 +213,7 @@ def btn_show_reg_result():
 
 def btn_show_seg_result():
     try:
-        seg_img_path = os.path.join(var_output_path.get(), "t1_brain_segmentation_MNI.nii.gz")
+        seg_img_path = os.path.join(var_output_path.get(), "t1_brain_MNI.nii.gz")
         ipf.plot_image(seg_img_path, "Tissue Segmentation Result in MNI space", is_segmented=True)
     except Exception as e:
         print(f"Error displaying segmentation result:\n{e}")

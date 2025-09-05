@@ -26,7 +26,7 @@ import re
 #------------------------------
 
 # Set appearance and theme
-ctk.set_appearance_mode("dark")  # modes: "System", "Dark", "Light"
+ctk.set_appearance_mode("Dark")  # modes: "System", "Dark", "Light"
 ctk.set_default_color_theme("blue")  # themes: "blue", "green", "dark-blue"
 
 # Create the app window
