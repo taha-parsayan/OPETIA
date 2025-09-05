@@ -27,9 +27,8 @@ class MRIPanel:
         self._setup_variables()
         self._build_gui()
         # Lets print something to start
-        print("OPETIA is ready to analyze your data!")
-        print("Analyze log will be printed here.")
-
+        self.log("OPETIA is ready to analyze your data!")
+        self.log("Analyze log will be printed here.")
 
     # -------------------------------
     # Variables
@@ -141,11 +140,9 @@ class MRIPanel:
 
         # -------------------------------
         # Log box (console)
-        self.log_box = ctk.CTkTextbox(master=self.parent, width=1010, height=300)
-        self.log_box.place(x=5, y=480)
-        self.log_box.configure(state="disabled")  # Start as read-only
-        sys.stdout = StdoutRedirector(self.log_box)
-
+        self.print_box = ctk.CTkTextbox(master=self.parent, width=1010, height=300)
+        self.print_box.place(x=5, y=480)
+        self.print_box.configure(state="disabled")  # Start as read-only
 
 
     # -------------------------------
@@ -177,6 +174,16 @@ class MRIPanel:
             messagebox.showinfo("Error...", "Invalid folder path!")
 
     # -------------------------------
+    # For logging
+    # -------------------------------
+    def log(self, message: str):
+        """Print a message to the panel's log box."""
+        self.print_box.configure(state="normal")
+        self.print_box.insert("end", message + "\n")
+        self.print_box.see("end")  # auto-scroll
+        self.print_box.configure(state="disabled")
+    
+    # -------------------------------
     # Modality & registration methods
     # -------------------------------
     def set_modality(self, choice):
@@ -207,7 +214,7 @@ class MRIPanel:
     # -------------------------------
     def btn_process_data(self):
         t1 = time.time()
-        print("\n____________OPETIA is Processing your data___________")
+        self.log("\n____________OPETIA is Processing your data___________")
 
         # Output folder
         if self.var_check_delete_outputs.get():
@@ -218,43 +225,43 @@ class MRIPanel:
             os.makedirs(self.var_output_path.get(), exist_ok=True)
 
         # Skull stripping
-        print("\nSkull stripping...")
+        self.log("\nSkull stripping...")
         try:
             ipf.skull_strip(self.var_mri_path.get(),
                              os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain.nii.gz"),
                              os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_mask.nii.gz"),
                              self.mri_modality)
-            print("Skull stripping completed successfully.")
+            self.log("Skull stripping completed successfully.")
         except Exception as e:
-            print(f"Error during Skull Stripping:\n{e}")
+            self.log(f"Error during Skull Stripping:\n{e}")
             return
 
         # Segmentation
-        print("\nGM, WM, CSF segmentation in native space...")
+        self.log("\nGM, WM, CSF segmentation in native space...")
         try:
             input_image = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain.nii.gz")
             brain_mask = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_mask.nii.gz")
             output_seg = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_segmentation.nii.gz")
             ipf.tissue_segmentation(input_image, brain_mask, output_seg)
             ipf.split_tissues(input_image, self.mri_modality, output_seg, self.var_output_path.get(), False)
-            print("Segmentation completed successfully.")
+            self.log("Segmentation completed successfully.")
         except Exception as e:
-            print(f"Error during tissue segmentation:\n{e}")
+            self.log(f"Error during tissue segmentation:\n{e}")
             return
 
         # Registration to MNI
-        print("\nImage registration to MNI152 space...")
+        self.log("\nImage registration to MNI152 space...")
         try:
             input_image = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain.nii.gz")
             output_mni = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_MNI.nii.gz")
             ipf.register_to_MNI(input_image, output_mni, self.registration_type, True)
-            print("Registration to MNI completed successfully.")
+            self.log("Registration to MNI completed successfully.")
         except Exception as e:
-            print(f"Error during Registration:\n{e}")
+            self.log(f"Error during Registration:\n{e}")
             return
 
         # Registration of segments to MNI space
-        print("\nRegistration of image segments from native to MNI152 space...")
+        self.log("\nRegistration of image segments from native to MNI152 space...")
         input_image = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_segmentation.nii.gz")
         output_path = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_segmentation_MNI.nii.gz")
         MRI_MNI = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_MNI.nii.gz")
@@ -269,12 +276,12 @@ class MRIPanel:
             ipf.apply_transform_to_image(input_image, output_path, transform_list)
             ipf.split_tissues(MRI_MNI, self.mri_modality, output_path, self.var_output_path.get(), True)
 
-            print("Registration of Image segments to MNI152 space completed successfully.")
+            self.log("Registration of Image segments to MNI152 space completed successfully.")
         except Exception as e:
-            print(f"Error during registration of image segments to MNI152 space:\n{e}")
+            self.log(f"Error during registration of image segments to MNI152 space:\n{e}")
 
         t2 = time.time()
-        print(f"\nFinished processing. Total time: {(t2 - t1)/60:.2f} minutes")
+        self.log(f"\nFinished processing. Total time: {(t2 - t1)/60:.2f} minutes")
 
     def btn_show_reg_result(self):
         try:
@@ -282,7 +289,7 @@ class MRIPanel:
             reg_img_path = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_MNI.nii.gz")
             ipf.plot_overlay(mni_img_path, reg_img_path, "Registration Result: MNI (background) and T1 (overlay)")
         except Exception as e:
-            print(f"Error displaying registration result:\n{e}")
+            self.log(f"Error displaying registration result:\n{e}")
             return
 
     def btn_show_seg_result(self):
@@ -290,7 +297,7 @@ class MRIPanel:
             seg_img_path = os.path.join(self.var_output_path.get(), f"{self.mri_modality}_brain_segmentation_MNI.nii.gz")
             ipf.plot_image(seg_img_path, "Tissue Segmentation Result in MNI space", is_segmented=True)
         except Exception as e:
-            print(f"Error displaying segmentation result:\n{e}")
+            self.log(f"Error displaying segmentation result:\n{e}")
             return
 
 

@@ -26,8 +26,8 @@ class PETPanel:
         self._setup_variables()
         self._build_gui()
         # Lets print something to start
-        print("OPETIA is ready to analyze your data!")
-        print("Analyze log will be printed here.")
+        self.log("OPETIA is ready to analyze your data!")
+        self.log("Analyze log will be printed here.")
 
     # -------------------------------
     # Variables
@@ -126,10 +126,9 @@ class PETPanel:
 
         # -------------------------------
         # Log box (console)
-        self.log_box = ctk.CTkTextbox(master=self.parent, width=1090, height=250)
-        self.log_box.place(x=5, y=530)
-        self.log_box.configure(state="disabled")  # Start as read-only
-        sys.stdout = StdoutRedirector(self.log_box)
+        self.print_box = ctk.CTkTextbox(master=self.parent, width=1090, height=250)
+        self.print_box.place(x=5, y=530)
+        self.print_box.configure(state="disabled")  # Start as read-only
 
     # -------------------------------
     # File selection methods
@@ -177,27 +176,37 @@ class PETPanel:
         self.registration_type = self.linear_options_dict.get(choice, "Rigid")
 
     # -------------------------------
+    # For logging
+    # -------------------------------
+    def log(self, message: str):
+        """Print a message to the panel's log box."""
+        self.print_box.configure(state="normal")
+        self.print_box.insert("end", message + "\n")
+        self.print_box.see("end")  # auto-scroll
+        self.print_box.configure(state="disabled")
+
+    # -------------------------------
     # Processing methods
     # -------------------------------
     def btn_process_data(self):
         t1 = time.time()
-        print("\n____________OPETIA is Processing your data___________")
+        self.log("\n____________OPETIA is Processing your data___________")
 
         # First need to split the dynamic PET into volumes
-        print("\nSplitting the dynamic PET into its volumes...")
+        self.log("\nSplitting the dynamic PET into its volumes...")
 
         input_PET_dynamic = self.var_pet_path.get()
         output_dir = self.var_output_path.get()
         try:
             ipf.split_dynamic_pet(input_PET_dynamic, output_dir)
-            print("Dynamic PET volume splitting completed successfully.")
+            self.log("Dynamic PET volume splitting completed successfully.")
         except Exception as e:
-            print(f"Error during splitting the dynamic PET:\n{e}")
+            self.log(f"Error during splitting the dynamic PET:\n{e}")
             return
         
         # Co-registering PET vols to T1
         # Here images still have the skull
-        print("\nCoregistering PET volumes to T1 space...")
+        self.log("\nCoregistering PET volumes to T1 space...")
 
         # Read the volumes
         def find_PET_volumes(path):
@@ -210,7 +219,7 @@ class PETPanel:
 
         pet_vols = find_PET_volumes(self.var_output_path.get())
         n = len(pet_vols)
-        print(f"{n} PET volumes were found.")
+        self.log(f"{n} PET volumes were found.")
 
         try:
             # Coregister PET to T1
@@ -225,38 +234,38 @@ class PETPanel:
             # Add coregistered vols to create PET.nii.gz
             ipf.add_PET_vols(self.var_output_path.get())
 
-            print("Co-registration from PET to T1 space completed successfully.")
+            self.log("Co-registration from PET to T1 space completed successfully.")
         except Exception as e:
-            print(f"Error during co-registration to MNI152 space:\n{e}")
+            self.log(f"Error during co-registration to MNI152 space:\n{e}")
             return
 
         # Brain extraction
-        print("\nSkull stripping...")
+        self.log("\nSkull stripping...")
         input_image = os.path.join(self.var_output_path.get(), "pet_coreg.nii.gz")
         input_mask_folder = self.var_MRI_masks_folder.get()
         input_mask = os.path.join(input_mask_folder, "t1_brain_mask.nii.gz")
         output_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain.nii.gz")
         try:
             ipf.apply_mask(input_image, input_mask, output_image)
-            print("Skull stripping completed successfully.")
+            self.log("Skull stripping completed successfully.")
         except Exception as e:
-            print(f"Error during skull stripping:\n{e}")
+            self.log(f"Error during skull stripping:\n{e}")
             return
 
         # Smoothing the image in native space
-        print("\nSmoothing the image in native space...")
+        self.log("\nSmoothing the image in native space...")
         input_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain.nii.gz")
         output_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain_smooth.nii.gz")
         fwhm = self.var_smooth_FWHM.get()
         try:
             ipf.smooth_image(input_image, output_image, fwhm)
-            print("Smoothing completed successfully.")
+            self.log("Smoothing completed successfully.")
         except Exception as e:
-            print(f"Error during smoothing in native space:\n{e}")
+            self.log(f"Error during smoothing in native space:\n{e}")
             return
 
         # Tissue Segmentation
-        print("\nGM, WM, CSF segmentation in native space...")
+        self.log("\nGM, WM, CSF segmentation in native space...")
         input_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain_smooth.nii.gz")
         input_mask_GM = os.path.join(self.var_MRI_masks_folder.get(), "Mask_t1_GM_native.nii.gz")
         input_mask_WM = os.path.join(self.var_MRI_masks_folder.get(), "Mask_t1_WM_native.nii.gz")
@@ -269,14 +278,13 @@ class PETPanel:
             ipf.apply_mask(input_image, input_mask_GM, output_GM)
             ipf.apply_mask(input_image, input_mask_WM, output_WM)
             ipf.apply_mask(input_image, input_mask_CSF, output_CSF)
-            print("Segmentation completed successfully.") 
+            self.log("Segmentation completed successfully.") 
         except Exception as e:
-            print(f"Error during PET segmentation:\n{e}")
+            self.log(f"Error during PET segmentation:\n{e}")
             return
 
         # Registration to MNI
-        print("\n")
-        print("Image registration to MNI152 space...")
+        self.log("\nImage registration to MNI152 space...")
         input_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain.nii.gz")
         output_path = os.path.join(self.var_output_path.get(), "pet_coreg_brain_MNI.nii.gz")
 
@@ -289,26 +297,25 @@ class PETPanel:
 
         try:
             ipf.apply_transform_to_image(input_image, output_path, transform_list)
-            print("Registration of Image to MNI152 space completed successfully.")
+            self.log("Registration of Image to MNI152 space completed successfully.")
         except Exception as e:
-            print(f"Error during registration of image to MNI152 space:\n{e}")
+            self.log(f"Error during registration of image to MNI152 space:\n{e}")
             return
 
         # Smoothing the image in MNI space
-        print("\nSmoothing the image in MNI152 space...")
+        self.log("\nSmoothing the image in MNI152 space...")
         input_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain_MNI.nii.gz")
         output_image = os.path.join(self.var_output_path.get(), "pet_coreg_brain_MNI_smooth.nii.gz")
         fwhm = self.var_smooth_FWHM.get()
         try:
             ipf.smooth_image(input_image, output_image, fwhm)
-            print("Smoothing completed successfully.")
+            self.log("Smoothing completed successfully.")
         except Exception as e:
-            print(f"Error during smoothing in MNI space:\n{e}")
+            self.log(f"Error during smoothing in MNI space:\n{e}")
             return
         
         # Tissue segmentation in MNI
-        print("\n")
-        print("GM, WM, CSF segmentation in MNI152 space...")
+        self.log("\nGM, WM, CSF segmentation in MNI152 space...")
         input_PET = os.path.join(self.var_output_path.get(), "pet_coreg_brain_MNI_smooth.nii.gz")
         # Need to check which MRI modality was used
         if os.path.exists(os.path.join(self.var_output_path.get(), "Mask_t1_GM_MNI.nii.gz")):
@@ -334,14 +341,14 @@ class PETPanel:
             ipf.apply_mask(input_PET, mask_GM, out_GM)
             ipf.apply_mask(input_PET, mask_WM, out_WM)
             ipf.apply_mask(input_PET, mask_CSF, out_CSF)
-            print("Registration of Image segments to MNI152 space completed successfully.")
+            self.log("Registration of Image segments to MNI152 space completed successfully.")
         except Exception as e:
-            print(f"Error during registration of image segments to MNI152 space:\n{e}")
+            self.log(f"Error during registration of image segments to MNI152 space:\n{e}")
             return
 
         t2 = time.time()
-        print("\nFinished processing.")
-        print(f"Total time: {(t2-t1)/60:.2f} minutes")
+        self.log("\nFinished processing.")
+        self.log(f"Total time: {(t2-t1)/60:.2f} minutes")
     
 
     def btn_show_reg_result(self):
@@ -350,7 +357,7 @@ class PETPanel:
             reg_img_path = os.path.join(self.var_output_path.get(), "pet_coreg_brain_MNI.nii.gz")
             ipf.plot_overlay(MNI_path, reg_img_path, "Registration Result: MNI (background) and PET (overlay)")
         except Exception as e:
-            print(f"Error displaying registration result:\n{e}")
+            self.log(f"Error displaying registration result:\n{e}")
 
     def btn_show_seg_result(self):
         try:
@@ -360,25 +367,5 @@ class PETPanel:
             ipf.plot_3_images_overlay(gm_path, wm_path, csf_path, 
                                     "Tissue Segmentation Result in MNI space")
         except Exception as e:
-            print(f"Error displaying segmentation result:\n{e}")
+            self.log(f"Error displaying segmentation result:\n{e}")
 
-
-
-# -------------------------------
-# Log class
-# -------------------------------
-"""
-It is aseparate class to print the output log inside the log box in GUI
-"""
-class StdoutRedirector:
-    def __init__(self, textbox):
-        self.textbox = textbox
-
-    def write(self, string):
-        self.textbox.configure(state="normal")
-        self.textbox.insert("end", string)
-        self.textbox.see("end")  # Auto-scroll
-        self.textbox.configure(state="disabled")
-
-    def flush(self):
-        pass

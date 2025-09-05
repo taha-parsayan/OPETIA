@@ -22,7 +22,7 @@ from PET_Panel import PETPanel
 #------------------------------
 
 ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("green")
+ctk.set_default_color_theme("blue")
 
 # Main window
 app = ctk.CTk()
