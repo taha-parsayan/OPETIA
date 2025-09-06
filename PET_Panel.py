@@ -1,5 +1,9 @@
 """
-PET Image Processing Panel for OPETIA
+PET Image Processing Panel for OPETIA:
+
+This pipeline applies standard image processing to dynamic PET image.
+Before this pipeline, MRI image needs to be processed using OPETIA.
+
 Author: Taha Parsayan
 """
 
@@ -131,7 +135,7 @@ class PETPanel:
         self.print_box.configure(state="disabled")  # Start as read-only
 
     # -------------------------------
-    # File selection methods
+    # Functions
     # -------------------------------
     def get_address_file(self):
         file = filedialog.askopenfile(mode='r', filetypes=[("NIfTI files", "*.nii"), ("Compressed NIfTI files", "*.gz")])
@@ -175,9 +179,7 @@ class PETPanel:
     def set_reg_type(self, choice):
         self.registration_type = self.linear_options_dict.get(choice, "Rigid")
 
-    # -------------------------------
     # For logging
-    # -------------------------------
     def log(self, message: str):
         """Print a message to the panel's log box."""
         self.print_box.configure(state="normal")
@@ -185,9 +187,7 @@ class PETPanel:
         self.print_box.see("end")  # auto-scroll
         self.print_box.configure(state="disabled")
 
-    # -------------------------------
     # Processing methods
-    # -------------------------------
     def btn_process_data(self):
         t1 = time.time()
         self.log("\n____________OPETIA is Processing your data___________")

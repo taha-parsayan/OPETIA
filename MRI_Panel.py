@@ -1,5 +1,9 @@
 """
-MRI Image Processing Panel for OPETIA
+MRI Image Processing Panel for OPETIA:
+
+This pipeline applies standard MRI image processing.
+The image can be T1, T2, or Flair.
+
 Author: Taha Parsayan
 """
 
@@ -146,7 +150,7 @@ class MRIPanel:
 
 
     # -------------------------------
-    # File selection methods
+    # Functions
     # -------------------------------
     def get_address_file(self):
         file = filedialog.askopenfile(mode='r', filetypes=[("NIfTI files", "*.nii"), ("Compressed NIfTI files", "*.gz")])
@@ -173,9 +177,6 @@ class MRIPanel:
         else:
             messagebox.showinfo("Error...", "Invalid folder path!")
     
-    # -------------------------------
-    # Modality & registration methods
-    # -------------------------------
     def set_modality(self, choice):
         if choice == "T1 weigted":
             self.mri_modality = "t1"
@@ -199,9 +200,7 @@ class MRIPanel:
         else:
             self.registration_type = self.nonlinear_options_dict.get(registration_type, "SyN")
 
-    # -------------------------------
     # For logging
-    # -------------------------------
     def log(self, message: str):
         """Print a message to the panel's log box."""
         self.print_box.configure(state="normal")
@@ -209,9 +208,7 @@ class MRIPanel:
         self.print_box.see("end")  # auto-scroll
         self.print_box.configure(state="disabled")
 
-    # -------------------------------
     # Processing methods
-    # -------------------------------
     def btn_process_data(self):
         t1 = time.time()
         self.log("\n____________OPETIA is Processing your data___________")
