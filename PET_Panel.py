@@ -122,11 +122,11 @@ class PETPanel:
         #-------------------------------------
         # Processing buttons
 
-        btn5 = ctk.CTkButton(master=self.parent, text="Process data", width=390, height=25, 
+        ctk.CTkButton(master=self.parent, text="Process data", width=390, height=25, 
                              command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
                              ).place(x=5, y=430)
-        btn6 = ctk.CTkButton(master=self.parent, text="Show registration result", width=390, height=25, command=self.btn_show_reg_result).place(x=5, y=460)
-        btn7 = ctk.CTkButton(master=self.parent, text="Show segmentation results", width=390, height=25, command=self.btn_show_seg_result).place(x=5, y=490)
+        ctk.CTkButton(master=self.parent, text="Show registration result", width=390, height=25, command=self.btn_show_reg_result).place(x=5, y=460)
+        ctk.CTkButton(master=self.parent, text="Show segmentation results", width=390, height=25, command=self.btn_show_seg_result).place(x=5, y=490)
 
         # -------------------------------
         # Log box (console)
@@ -148,21 +148,15 @@ class PETPanel:
 
     def set_PET_folder(self):
         pet_path = self.get_address_file()
-        if pet_path and os.path.exists(pet_path):
-            self.var_pet_path.set(pet_path)
-            dir_path = os.path.dirname(pet_path)
-            self.var_output_path.set(os.path.join(dir_path, "OPETIA_output"))
-            self.var_MRI_reg_matrix_folder.set(self.var_output_path.get())
-            self.var_MRI_masks_folder.set(self.var_output_path.get())
-        else:
-            messagebox.showinfo("Error...", "Invalid PET file path!")
+        self.var_pet_path.set(pet_path)
+        dir_path = os.path.dirname(pet_path)
+        self.var_output_path.set(os.path.join(dir_path, "OPETIA_output"))
+        self.var_MRI_reg_matrix_folder.set(self.var_output_path.get())
+        self.var_MRI_masks_folder.set(self.var_output_path.get())
 
     def set_output_address(self):
         address = self.get_address_folder()
-        if os.path.exists(address):
-            self.var_output_path.set(address)
-        else:
-            messagebox.showinfo("Error...", "Invalid folder path!")
+        self.var_output_path.set(address)
 
     def set_reg_matrix_address(self):
         folder_path = self.get_address_folder()

@@ -163,20 +163,14 @@ class MRIPanel:
 
     def set_MRI_address(self):
         address = self.get_address_file()
-        if address and os.path.exists(address):
-            self.var_mri_path.set(address)
-            output_address = os.path.join(os.path.dirname(address), "OPETIA_output")
-            self.var_output_path.set(output_address)
-        else:
-            messagebox.showinfo("Error...", "Invalid file path!")
+        self.var_mri_path.set(address)
+        output_address = os.path.join(os.path.dirname(address), "OPETIA_output")
+        self.var_output_path.set(output_address)
 
     def set_output_address(self):
         address = self.get_address_folder()
-        if address and os.path.exists(address):
-            self.var_output_path.set(address)
-        else:
-            messagebox.showinfo("Error...", "Invalid folder path!")
-    
+        self.var_output_path.set(address)
+
     def set_modality(self, choice):
         if choice == "T1 weigted":
             self.mri_modality = "t1"

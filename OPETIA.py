@@ -14,9 +14,10 @@ from tkinter import filedialog
 import tkinter.messagebox as messagebox
 from PIL import Image
 import Image_Processing_Functions as ipf
+from tkinter import PhotoImage
 from MRI_Panel import MRIPanel
 from PET_Panel import PETPanel
-from tkinter import PhotoImage
+from ROI_Panel import ROIpanel
 
 #------------------------------
 # GUI Setup
@@ -107,8 +108,7 @@ PETPanel(panels["pet"])
 
 # ROI panel
 panels["roi"] = ctk.CTkFrame(right_panel)
-ctk.CTkLabel(panels["roi"], text="ROI Feature Extraction Panel", font=("Arial", 18)).pack(pady=20)
-
+ROIpanel(panels["roi"])
 #------------------------------
 # Start with MRI Panel
 #------------------------------
