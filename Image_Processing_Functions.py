@@ -486,3 +486,24 @@ def plot_3_images_overlay(img1_path, img2_path, img3_path, title, num_slices=30)
     plt.tight_layout()
     plt.show()
 
+#------------------------------
+# Segmentation of ROIs
+#------------------------------
+def ROI_segmentation(input_path, output_path, image):
+    """
+    - Binarize MRI gray matter -> mask
+    - ROI masks x MRI gray matter mask - > Subject ROI mask
+    - Subject ROIs mask x image -> image ROIs
+    - image can be MRI or PET
+
+    Parameters:
+    - input_path: OPETIA_output
+    - output_path: ROI_Analysis
+    - image: MRI or PET in the MNI152 space
+    """
+
+    current_dir = os.getcwd()
+    cortical_ROIs_dir = os.path.join(current_dir, "atlas_cortical")
+    subcortical_ROIs_dir = os.path.join(current_dir, "atlas_subcortical")
+
+    
