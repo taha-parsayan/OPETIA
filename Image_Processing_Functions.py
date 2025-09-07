@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import fnmatch
 import math
-
+import glob
 
 #------------------------------
 # Skull Stripping using ANTsPyNet
@@ -487,23 +487,47 @@ def plot_3_images_overlay(img1_path, img2_path, img3_path, title, num_slices=30)
     plt.show()
 
 #------------------------------
-# Segmentation of ROIs
+# Segmentation of ROIs - Harvard-Oxford Atlas
 #------------------------------
-def ROI_segmentation(input_path, output_path, image):
+def ROI_segmentation_Harvard_Oxford(image_path, output_path, image_modality = "MRI"):
     """
-    - Binarize MRI gray matter -> mask
-    - ROI masks x MRI gray matter mask - > Subject ROI mask
-    - Subject ROIs mask x image -> image ROIs
-    - image can be MRI or PET
+    Applying Harvard-Oxford atlas ROI masks into an image
 
     Parameters:
-    - input_path: OPETIA_output
+    - image: MRI Gray Matter or PET Gray Matter
     - output_path: ROI_Analysis
-    - image: MRI or PET in the MNI152 space
+    - image_modality: MRI or PET
     """
 
     current_dir = os.getcwd()
+    # Path to the ROI masks
     cortical_ROIs_dir = os.path.join(current_dir, "atlas_cortical")
     subcortical_ROIs_dir = os.path.join(current_dir, "atlas_subcortical")
 
+    # Read the image
+    image = ants.image_read(image_path)
+    
+    # Applying subcortical masks
+    for i in range(1, 20):
+        pattern = os.path.join(subcortical_ROIs_dir, f"{i}_*.nii.gz")
+        matches = glob.glob(pattern)
+        if not matches:
+            raise FileNotFoundError(f"No ROI mask found for pattern: {pattern}")
+        roi_path = matches[0]
+        ROI_mask = ants.image_read(roi_path) # ROI mask from atlas
+        ROI = image * ROI_mask # ROI
+        out_path = os.path.join(output_path, f"{image_modality}_Subcortical_ROIs", f"{i}.nii.gz")
+        ants.image_write(ROI, out_path)
+
+    # Applying cortical masks
+    for i in range(1, 97):
+        pattern = os.path.join(cortical_ROIs_dir, f"{i}.nii.gz")
+        matches = glob.glob(pattern)
+        if not matches:
+            raise FileNotFoundError(f"No ROI mask found for pattern: {pattern}")
+        roi_path = matches[0]
+        ROI_mask = ants.image_read(roi_path) # ROI mask from atlas
+        ROI = image * ROI_mask # ROI
+        out_path = os.path.join(output_path, f"{image_modality}_Cortical_ROIs", f"{i}.nii.gz")
+        ants.image_write(ROI, out_path)
     

@@ -31,6 +31,9 @@ class ROIpanel:
         self.parent = parent
         self._setup_variables()
         self._build_gui()
+        # Lets print something to start
+        self.log("OPETIA is ready to analyze your data!")
+        self.log("Analyze log will be printed here.")
     
     # -------------------------------
     # Variables
@@ -55,6 +58,8 @@ class ROIpanel:
         self.atlas_list = [
             "Harvard-Oxford Atlas"
         ]
+        self.var_check_analyze_MRI = ctk.BooleanVar(value=True)
+        self.var_check_analyze_PET = ctk.BooleanVar(value=True)
 
     # -------------------------------
     # GUI Layout
@@ -96,12 +101,21 @@ class ROIpanel:
                             variable=self.var_atlas,
                             ).place(x=5, y=40)
         
+        # -------------------------------
+        # Frame4: SUVR reference region
+        frame4 = ctk.CTkFrame(master=self.parent, width=390, height=75, border_color="#ffffff", border_width=1)
+        frame4.place(x=5, y=335)
+
+        # Checkbox
+        ctk.CTkCheckBox(master=frame4, text="Analyze MRI image", variable=self.var_check_analyze_MRI, font=("Times New Roman", 15)).place(x=10, y=10)
+        ctk.CTkCheckBox(master=frame4, text="Analyze PET image", variable=self.var_check_analyze_PET, font=("Times New Roman", 15)).place(x=10, y=40)
+        
         #-------------------------------------
         # Processing buttons
 
         ctk.CTkButton(master=self.parent, text="Process data", width=390, height=25, 
                              command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
-                             ).place(x=5, y=330)
+                             ).place(x=5, y=415)
         
         # -------------------------------
         # Log box (console)
@@ -163,9 +177,31 @@ class ROIpanel:
             self.log("\nThe input path does not exists!")
             return
         
-        # Segmenting the ROIs
-        self.log("\nSegmentation of ROIs from the MRI image...")
-        
+        # Segmenting the ROIs from MRI image
+        if self.var_check_analyze_MRI.get():
+            self.log("\nSegmentation of ROIs from the MRI image...")
+            try:
+                image = os.path.join(self.var_input_path.get(), "t1_GM_MNI.nii.gz")
+                ipf.ROI_segmentation_Harvard_Oxford(
+                    image,
+                    self.var_output_path.get(),
+                    "MRI")
+                self.log("Image segmentation completed")
+            except Exception as e:
+                self.log(f"\nError in ROI segmentation:\n{e}")
+
+        # Segmenting the ROIs from PET image
+        if self.var_check_analyze_PET.get():
+            self.log("\nSegmentation of ROIs from the PET image...")
+            try:
+                image = os.path.join(self.var_input_path.get(), "pet_GM_MNI.nii.gz")
+                ipf.ROI_segmentation_Harvard_Oxford(
+                    image,
+                    self.var_output_path.get(),
+                    "PET")
+                self.log("Image segmentation completed")
+            except Exception as e:
+                self.log(f"\nError in ROI segmentation:\n{e}")
 
 
 
