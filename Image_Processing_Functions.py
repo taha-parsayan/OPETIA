@@ -530,4 +530,38 @@ def ROI_segmentation_Harvard_Oxford(image_path, output_path, image_modality = "M
         ROI = image * ROI_mask # ROI
         out_path = os.path.join(output_path, f"{image_modality}_Cortical_ROIs", f"{i}.nii.gz")
         ants.image_write(ROI, out_path)
+
+#------------------------------
+# Calculate volume from MRI
+#------------------------------
+def calculate_mri_volume(file_path, threshold=0):
+    """
+    Calculate the volume of an MRI image (or mask) in mm^3.
+
+    Parameters:
+    - file_path: str, path to the NIfTI image
+    - threshold: float, voxel intensity threshold to count as "inside" (default=0)
+
+    Returns:
+    - total_volume_mm3: float, volume in cubic millimeters
+    """
+    # Load image
+    img = ants.image_read(file_path)
+    
+    # Get voxel spacing and volume
+    voxel_spacing = img.spacing
+    voxel_volume = np.prod(voxel_spacing)  # in mm^3
+
+    # Get data array
+    data = img.numpy()
+    
+    # Count voxels above threshold
+    n_voxels = (data > threshold).sum()
+    
+    # Calculate total volume in mm^3
+    total_volume_mm3 = n_voxels * voxel_volume
+    
+    return total_volume_mm3
+
+
     
