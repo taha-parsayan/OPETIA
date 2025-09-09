@@ -564,4 +564,44 @@ def calculate_mri_volume(file_path, threshold=0):
     return total_volume_mm3
 
 
-    
+#------------------------------
+# Calculate SUVR from PET
+#------------------------------
+def calculate_suvr(ROI_path, reference_path):
+    """
+    Calculate SUVR (Standardized Uptake Value Ratio) from a PET image.
+
+    Parameters:
+    - ROI_path: str, path to ROI mask (binary NIfTI)
+    - reference_path: str, path to reference region mask (binary NIfTI)
+
+    Returns:
+    - SUVR_mean, SUVR_max, SUVR_min (floats)
+    """
+    import ants
+    import numpy as np
+
+    # Load ROI and reference masks
+    ROI = ants.image_read(ROI_path).numpy()
+    ref = ants.image_read(reference_path).numpy()
+
+    # Extract voxel values (ignore background 0s)
+    ROI_data = ROI[ROI > 0]
+    ref_data = ref[ref > 0]
+
+    # Calculate SUV values
+    SUV_mean = float(np.mean(ROI_data))
+    SUV_max = float(np.max(ROI_data))
+    SUV_min = float(np.min(ROI_data))
+
+    ref_mean = float(np.mean(ref_data))
+
+    # Calculate SUVR (ROI / reference)
+    SUVR_mean = SUV_mean / ref_mean
+    SUVR_max = SUV_max / ref_mean
+    SUVR_min = SUV_min / ref_mean
+
+    return SUVR_mean, SUVR_max, SUVR_min
+
+
+
