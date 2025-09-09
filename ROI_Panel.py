@@ -21,6 +21,7 @@ from tkinter import filedialog, messagebox
 from PIL import Image
 import Image_Processing_Functions as ipf
 import threading
+import pandas as pd
 
 # ------------------------------
 # Main class
@@ -39,20 +40,14 @@ class ROIpanel:
     # Variables
     # -------------------------------
     def _setup_variables(self):
+        #----------------------------
+        # GUI variables
         self.var_input_path = ctk.StringVar()
         self.var_input_path.set("Path to OPETIA_output folder")
         self.var_output_path = ctk.StringVar()
         self.var_output_path.set("Path to OPETIA_output/ROI_Analysis folder")
         self.var_SUVR_ref = ctk.StringVar()
         self.var_SUVR_ref.set("Cerebellum Gray Matter")
-        self.SUVR_ref = [
-            "Cerebellum",
-            "Cerebellum Gray Matter",
-            "Global Gray Matter",
-            "Global White Matter",
-            "Pons",
-            "Whole Brain"
-        ]
         self.var_atlas = ctk.StringVar()
         self.var_atlas.set("Harvard-Oxford Atlas")
         self.atlas_list = [
@@ -60,6 +55,22 @@ class ROIpanel:
         ]
         self.var_check_analyze_MRI = ctk.BooleanVar(value=True)
         self.var_check_analyze_PET = ctk.BooleanVar(value=True)
+
+        #----------------------------
+        # Other variables
+        self.SUVR_ref = [
+                    "Cerebellum",
+                    "Cerebellum Gray Matter",
+                    "Global Gray Matter",
+                    "Global White Matter",
+                    "Pons",
+                    "Whole Brain"
+                ]
+        
+        self.MRI_cortical_volume = pd.DataFrame(columns=["ROI", "volume"])
+        self.MRI_subcortical_volume = pd.DataFrame(columns=["ROI", "volume"])
+
+        self.all_measurements = pd.DataFrame(columns=["ROI", "volume"])
 
     # -------------------------------
     # GUI Layout
@@ -186,7 +197,7 @@ class ROIpanel:
                     image,
                     self.var_output_path.get(),
                     "MRI")
-                self.log("Image segmentation completed")
+                self.log("Image segmentation completed.")
             except Exception as e:
                 self.log(f"\nError in ROI segmentation:\n{e}")
 
@@ -199,9 +210,52 @@ class ROIpanel:
                     image,
                     self.var_output_path.get(),
                     "PET")
-                self.log("Image segmentation completed")
+                self.log("Image segmentation completed.")
             except Exception as e:
                 self.log(f"\nError in ROI segmentation:\n{e}")
 
+        # Calculate volume in mm3 from MRI
+        self.log("\nCalculating volume in mm3 from MRI image...")
 
+        if self.var_check_analyze_MRI.get():
+            # Cortical
+            try:
+                dir = os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs")
+                for i in range(1, 97): # 96 ROIs
+                    image = os.path.join(dir, f"{str(i)}.nii.gz")
+                    volume = ipf.calculate_mri_volume(image)
+                    self.MRI_cortical_volume.loc[i-1, "volume"] = volume # i-1 because daframe index begins with 0
+            except Exception as e:
+                self.log(f"Error in calculating the volume from MRI image:\n{e}")
+            # Subcortical
+            try:
+                dir = os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")
+                for i in range(1, 20): #19 ROIs
+                    image = os.path.join(dir, f"{str(i)}.nii.gz")
+                    volume = ipf.calculate_mri_volume(image)
+                    self.MRI_subcortical_volume.loc[i-1, "volume"] = volume # i-1 because daframe index begins with 0
+            except Exception as e:
+                self.log(f"Error in calculating the volume from MRI image:\n{e}")
+            
+            # Save
+            current_dir = os.getcwd()
+            dir = os.path.join(current_dir, "ROI_info") # Where ROI names are saved as txt
+            path_cortical = os.path.join(dir, "Areas_Cortical.txt") # Cortical ROI names
+            path_subcortical = os.path.join(dir, "Areas_Subcortical.txt") # Subcortical ROI names
+            cortical_ROI_names = pd.read_csv(path_cortical, sep="\t", header=None)
+            subcortical_ROI_names = pd.read_csv(path_subcortical, sep="\t", header=None)
 
+            # Add ROI names to the dataframes
+            self.MRI_cortical_volume["ROI"] = cortical_ROI_names
+            self.MRI_subcortical_volume["ROI"] = subcortical_ROI_names
+
+            # Concat cortical and subcortical as one row
+            self.all_measurements = pd.concat([self.MRI_cortical_volume, self.MRI_subcortical_volume], ignore_index=True)
+
+            path = os.path.join(self.var_output_path.get(), "MRI_measurements.csv")
+            self.all_measurements.to_csv(path, sep="\t", index=True)
+
+            self.log("Volume calculation completed successfully.")
+
+        t2 = time.time()
+        self.log(f"\nFinished processing. Total time: {(t2 - t1)/60:.2f} minutes")
