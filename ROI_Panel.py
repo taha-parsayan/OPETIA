@@ -201,6 +201,7 @@ class ROIpanel:
                 self.log("Image segmentation completed.")
             except Exception as e:
                 self.log(f"\nError in ROI segmentation:\n{e}")
+                return
 
         # Segmenting the ROIs from PET image
         if self.var_check_analyze_PET.get():
@@ -214,6 +215,7 @@ class ROIpanel:
                 self.log("Image segmentation completed.")
             except Exception as e:
                 self.log(f"\nError in ROI segmentation:\n{e}")
+                return
 
         # Calculate volume in mm3 from MRI
         self.log("\nCalculating volume in mm3 from MRI image...")
@@ -228,6 +230,7 @@ class ROIpanel:
                     self.MRI_cortical_volume.loc[i-1, "volume"] = volume # i-1 because daframe index begins with 0
             except Exception as e:
                 self.log(f"Error in calculating the volume from MRI image:\n{e}")
+                return
             # Subcortical
             try:
                 dir = os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")
@@ -237,6 +240,7 @@ class ROIpanel:
                     self.MRI_subcortical_volume.loc[i-1, "volume"] = volume # i-1 because daframe index begins with 0
             except Exception as e:
                 self.log(f"Error in calculating the volume from MRI image:\n{e}")
+                return
             
             self.log("Volume calculation completed successfully.")
 
@@ -249,26 +253,28 @@ class ROIpanel:
             try:
                 for i in range(1, 97):
                     image = os.path.join(dir, f"{str(i)}.nii.gz")
-                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI, self.var_output_path.get())
+                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI, self.var_input_path.get())
                     self.PET_cortical_SUVR.loc[i-1, "SUVR min"] = SUVR_min # i-1 because daframe index begins with 0
                     self.PET_cortical_SUVR.loc[i-1, "SUVR mean"] = SUVR_mean # i-1 because daframe index begins with 0
                     self.PET_cortical_SUVR.loc[i-1, "SUVR max"] = SUVR_max # i-1 because daframe index begins with 0
             except Exception as e:
                 self.log(f"Error in calculating cortical SUVR:\n{e}")
-
+                return
             # Subcortical
             dir = os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")
             refrence_ROI = self.var_SUVR_ref.get()
             try:
                 for i in range(1, 20):
                     image = os.path.join(dir, f"{str(i)}.nii.gz")
-                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI, self.var_output_path.get())
+                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI, self.var_input_path.get())
                     self.PET_subcortical_SUVR.loc[i-1, "SUVR min"] = SUVR_min # i-1 because daframe index begins with 0
                     self.PET_subcortical_SUVR.loc[i-1, "SUVR mean"] = SUVR_mean # i-1 because daframe index begins with 0
                     self.PET_subcortical_SUVR.loc[i-1, "SUVR max"] = SUVR_max # i-1 because daframe index begins with 0
             except Exception as e:
                 self.log(f"Error in calculating cortical SUVR:\n{e}")
-
+                return
+            
+            self.log("SUVR calculation completed successfully.")
 
             # Save the measurements
             self.log("\nSaving the measurements...")
