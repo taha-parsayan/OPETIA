@@ -69,8 +69,9 @@ class ROIpanel:
         
         self.MRI_cortical_volume = pd.DataFrame(columns=["ROI", "volume"])
         self.MRI_subcortical_volume = pd.DataFrame(columns=["ROI", "volume"])
-
-        self.all_measurements = pd.DataFrame(columns=["ROI", "volume"])
+        self.PET_cortical_SUVR = pd.DataFrame(columns=["ROI", "SUVR min", "SUVR mean", "SUVR max"])
+        self.PET_subcortical_SUVR = pd.DataFrame(columns=["ROI", "SUVR min", "SUVR mean", "SUVR max"])
+        self.all_measurements = pd.DataFrame(columns=["ROI", "volume", "SUVR min", "SUVR mean", "SUVR max"])
 
     # -------------------------------
     # GUI Layout
@@ -237,9 +238,45 @@ class ROIpanel:
             except Exception as e:
                 self.log(f"Error in calculating the volume from MRI image:\n{e}")
             
-            # Save
+            self.log("Volume calculation completed successfully.")
+
+        # Calculate volume in mm3 from MRI
+        self.log("\nCalculating SUVR from PET image...")
+        if self.var_check_analyze_PET.get():
+            # Cortical
+            dir = os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs")
+            refrence_ROI = self.var_SUVR_ref.get()
+            try:
+                for i in range(1, 97):
+                    image = os.path.join(dir, f"{str(i)}.nii.gz")
+                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI)
+                    self.PET_cortical_SUVR.loc[i-1, "SUVR min"] = SUVR_min # i-1 because daframe index begins with 0
+                    self.PET_cortical_SUVR.loc[i-1, "SUVR mean"] = SUVR_mean # i-1 because daframe index begins with 0
+                    self.PET_cortical_SUVR.loc[i-1, "SUVR max"] = SUVR_max # i-1 because daframe index begins with 0
+            except Exception as e:
+                self.log(f"Error in calculating cortical SUVR:\n{e}")
+
+            # Subcortical
+            dir = os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")
+            refrence_ROI = self.var_SUVR_ref.get()
+            try:
+                for i in range(1, 20):
+                    image = os.path.join(dir, f"{str(i)}.nii.gz")
+                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI)
+                    self.PET_subcortical_SUVR.loc[i-1, "SUVR min"] = SUVR_min # i-1 because daframe index begins with 0
+                    self.PET_subcortical_SUVR.loc[i-1, "SUVR mean"] = SUVR_mean # i-1 because daframe index begins with 0
+                    self.PET_subcortical_SUVR.loc[i-1, "SUVR max"] = SUVR_max # i-1 because daframe index begins with 0
+            except Exception as e:
+                self.log(f"Error in calculating cortical SUVR:\n{e}")
+
+
+            # Save the measurements
+            self.log("\nSaving the measurements...")
+
             current_dir = os.getcwd()
             dir = os.path.join(current_dir, "ROI_info") # Where ROI names are saved as txt
+
+            # Get ROI names
             path_cortical = os.path.join(dir, "Areas_Cortical.txt") # Cortical ROI names
             path_subcortical = os.path.join(dir, "Areas_Subcortical.txt") # Subcortical ROI names
             cortical_ROI_names = pd.read_csv(path_cortical, sep="\t", header=None)
@@ -248,14 +285,20 @@ class ROIpanel:
             # Add ROI names to the dataframes
             self.MRI_cortical_volume["ROI"] = cortical_ROI_names
             self.MRI_subcortical_volume["ROI"] = subcortical_ROI_names
+            self.PET_cortical_SUVR["ROI"] = cortical_ROI_names
+            self.PET_subcortical_SUVR["ROI"] = subcortical_ROI_names
 
             # Concat cortical and subcortical as one row
-            self.all_measurements = pd.concat([self.MRI_cortical_volume, self.MRI_subcortical_volume], ignore_index=True)
+            all_vol = pd.concat([self.MRI_cortical_volume, self.MRI_subcortical_volume], ignore_index=True)
+            all_suvr = pd.concat([self.PET_cortical_SUVR, self.PET_subcortical_SUVR], ignore_index=True)
+            self.all_measurements = pd.merge(all_vol, all_suvr, on="ROI", how="outer")
 
-            path = os.path.join(self.var_output_path.get(), "MRI_measurements.csv")
+            # Save
+            path = os.path.join(self.var_output_path.get(), "OPETIA_measurements.csv")
             self.all_measurements.to_csv(path, sep="\t", index=True)
 
-            self.log("Volume calculation completed successfully.")
+            self.log("Measurements saved successfully.")
+
 
         t2 = time.time()
         self.log(f"\nFinished processing. Total time: {(t2 - t1)/60:.2f} minutes")
