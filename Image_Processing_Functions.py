@@ -567,7 +567,7 @@ def calculate_mri_volume(file_path, threshold=0):
 #------------------------------
 # Calculate SUVR from PET
 #------------------------------
-def calculate_suvr(ROI_path, reference_path):
+def calculate_suvr(ROI_path, reference, OPETIA_output_path):
     """
     Calculate SUVR (Standardized Uptake Value Ratio) from a PET image.
 
@@ -578,12 +578,38 @@ def calculate_suvr(ROI_path, reference_path):
     Returns:
     - SUVR_mean, SUVR_max, SUVR_min (floats)
     """
-    import ants
-    import numpy as np
+
+    # Reference ROI
+    current_dir = os.getcwd()
+
+    if reference == "Cerebellum":
+        path = os.path.join(current_dir, "SUVR_reference_masks", "Cerebellum_mask.nii.gz")
+        ref = ants.image_read(path).numpy()
+    elif reference == "Cerebellum Gray Matter":
+        path = os.path.join(current_dir, "SUVR_reference_masks", "Cerebellum_mask.nii.gz")
+        ref = ants.image_read(path).numpy()
+        path = os.path.join(OPETIA_output_path, "Mask_t1_GM_MNI.nii.gz")
+        GM = ants.image_read(path).numpy()
+        ref = ref * GM
+    elif reference == "Global Gray Matter":
+        path = os.path.join(OPETIA_output_path, "Mask_t1_GM_MNI.nii.gz")
+        ref = ants.image_read(path).numpy()
+    elif reference == "Global White Matter":
+        path = os.path.join(OPETIA_output_path, "Mask_t1_WM_MNI.nii.gz")
+        ref = ants.image_read(path).numpy()
+    elif reference == "Pons":
+        path = os.path.join(current_dir, "SUVR_reference_masks", "Pons_mask.nii.gz")
+        ref = ants.image_read(path).numpy()
+    elif reference == "Whole Brain":
+        path = os.path.join(OPETIA_output_path, "Mask_t1_GM_MNI.nii.gz")
+        GM = ants.image_read(path).numpy()
+        path = os.path.join(OPETIA_output_path, "Mask_t1_WM_MNI.nii.gz")
+        WM = ants.image_read(path).numpy()
+        ref = GM + WM
+        ref[ref > 0] = 1
 
     # Load ROI and reference masks
     ROI = ants.image_read(ROI_path).numpy()
-    ref = ants.image_read(reference_path).numpy()
 
     # Extract voxel values (ignore background 0s)
     ROI_data = ROI[ROI > 0]
@@ -601,7 +627,7 @@ def calculate_suvr(ROI_path, reference_path):
     SUVR_max = SUV_max / ref_mean
     SUVR_min = SUV_min / ref_mean
 
-    return SUVR_mean, SUVR_max, SUVR_min
+    return SUVR_min, SUVR_mean, SUVR_max
 
 
 

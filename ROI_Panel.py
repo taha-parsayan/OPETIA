@@ -249,7 +249,7 @@ class ROIpanel:
             try:
                 for i in range(1, 97):
                     image = os.path.join(dir, f"{str(i)}.nii.gz")
-                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI)
+                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI, self.var_output_path.get())
                     self.PET_cortical_SUVR.loc[i-1, "SUVR min"] = SUVR_min # i-1 because daframe index begins with 0
                     self.PET_cortical_SUVR.loc[i-1, "SUVR mean"] = SUVR_mean # i-1 because daframe index begins with 0
                     self.PET_cortical_SUVR.loc[i-1, "SUVR max"] = SUVR_max # i-1 because daframe index begins with 0
@@ -262,7 +262,7 @@ class ROIpanel:
             try:
                 for i in range(1, 20):
                     image = os.path.join(dir, f"{str(i)}.nii.gz")
-                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI)
+                    SUVR_min, SUVR_mean, SUVR_max = ipf.calculate_suvr(image, refrence_ROI, self.var_output_path.get())
                     self.PET_subcortical_SUVR.loc[i-1, "SUVR min"] = SUVR_min # i-1 because daframe index begins with 0
                     self.PET_subcortical_SUVR.loc[i-1, "SUVR mean"] = SUVR_mean # i-1 because daframe index begins with 0
                     self.PET_subcortical_SUVR.loc[i-1, "SUVR max"] = SUVR_max # i-1 because daframe index begins with 0
