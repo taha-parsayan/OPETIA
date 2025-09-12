@@ -82,6 +82,18 @@ class ROIpanel:
     # GUI Layout
     # -------------------------------
     def _build_gui(self):
+
+        # Pipeline image
+        pipeline_image_path = os.path.join(os.getcwd(), "Images", "ROI_pipeline.png")
+        if os.path.exists(pipeline_image_path):
+            pipeline_image = Image.open(pipeline_image_path)
+            w, h = pipeline_image.size
+            scale = 0.44
+            new_w, new_h = int(w * scale), int(h * scale)
+            pipeline_image = pipeline_image.resize((new_w, new_h), Image.LANCZOS)
+            ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(new_w, new_h))
+            label_image = ctk.CTkLabel(master=self.parent, image=ctk_image, text="")
+            label_image.place(x=410, y=5)
         
         # -------------------------------
         # Frame1: Input paths
