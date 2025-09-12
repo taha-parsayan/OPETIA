@@ -1,19 +1,19 @@
-1 left_cerebral_cortex
-2 left_lateral_ventrical
-3 left_thalamus
-4 left_caudate
-5 left_putamen
-6 left_pallidum
-7 brain-stem
-8 left_hippocampus
-9 left_amygdala
-10 left_accumbens
-11 right_cerebral_cortex
-12 right_lateral_ventricle
-13 right_thalamus
-14 right_caudate
-15 right_putamen
-16 right_pallidum
-17 right_hippocampus
-18 right_amygdala
-19 right_accumbens
+cerebral_cortex_L
+lateral_ventrical_L
+thalamus_L
+caudate_L
+putamen_L
+pallidum_L
+brain-stem
+hippocampus_L
+amygdala_L
+accumbens_L
+cerebral_cortex_R
+lateral_ventricle_R
+thalamus_R
+caudate_R
+putamen_R
+pallidum_R
+hippocampus_R
+amygdala_R
+accumbens_R
