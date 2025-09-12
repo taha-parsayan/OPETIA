@@ -22,7 +22,8 @@ from PIL import Image
 import Image_Processing_Functions as ipf
 import threading
 import pandas as pd
-
+import platform
+import subprocess
 # ------------------------------
 # Main class
 # ------------------------------
@@ -66,12 +67,16 @@ class ROIpanel:
                     "Pons",
                     "Whole Brain"
                 ]
+        self._measurement_variables()
         
+    def _measurement_variables(self):
+        # need to keep them seperate so that I can restart them whenever needed.
+        # everytime the prcess btn is pushed, these need to be reset.
         self.MRI_cortical_volume = pd.DataFrame(columns=["ROI", "volume"])
         self.MRI_subcortical_volume = pd.DataFrame(columns=["ROI", "volume"])
         self.PET_cortical_SUVR = pd.DataFrame(columns=["ROI", "SUVR min", "SUVR mean", "SUVR max"])
         self.PET_subcortical_SUVR = pd.DataFrame(columns=["ROI", "SUVR min", "SUVR mean", "SUVR max"])
-        self.all_measurements = pd.DataFrame(columns=["ROI", "volume", "SUVR min", "SUVR mean", "SUVR max"])
+        self.all_measurements = pd.DataFrame()
 
     # -------------------------------
     # GUI Layout
@@ -124,10 +129,10 @@ class ROIpanel:
         
         #-------------------------------------
         # Processing buttons
-
         ctk.CTkButton(master=self.parent, text="Process data", width=390, height=25, 
                              command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
                              ).place(x=5, y=415)
+        ctk.CTkButton(master=self.parent, text="Show the measurements", width=390, height=25, command=self.show_measurements).place(x=5, y=445)
         
         # -------------------------------
         # Log box (console)
@@ -157,7 +162,19 @@ class ROIpanel:
         address = self.get_address_folder()
         self.var_output_path.set(address)
 
-        # For logging
+    def show_measurements(self):
+        path = os.path.join(self.var_output_path.get(), "OPETIA_measurements.csv")
+        if os.path.exists(path):
+            if platform.system() == "Windows": # windows
+                os.startfile(path)
+            elif platform.system() == "Darwin":  # macOS
+                subprocess.call(["open", path])
+            else:  # Linux
+                subprocess.call(["xdg-open", path])
+        else:
+            self.log("No measurements were found.")
+
+    # For logging
     def log(self, message: str):
         """Print a message to the panel's log box."""
         self.print_box.configure(state="normal")
@@ -170,21 +187,19 @@ class ROIpanel:
         t1 = time.time()
         self.log("\n____________OPETIA is Processing your data___________")
 
+        # Reset the measurement variables
+        self._measurement_variables()
+
         # Create the output folder (delete if exists)
         if os.path.exists(self.var_input_path.get()):
             if os.path.exists(self.var_output_path.get()):
-                shutil.rmtree(self.var_output_path.get()) # Remove ROI_Analysis folder
-                os.makedirs(self.var_output_path.get()) # Create ROI_Analysis folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")) # Create MRI_Subcortical_ROIs folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs")) # Create MRI_Cortical_ROIs folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "PET_Subcortical_ROIs")) # Create PET_Subcortical_ROIs folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "PET_Cortical_ROIs")) # Create PET_Cortical_ROIs folder
-            else:
-                os.makedirs(self.var_output_path.get()) # Create ROI_Analysis folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")) # Create Subcortical_ROIs folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs")) # Create Cortical_ROIs folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "PET_Subcortical_ROIs")) # Create PET_Subcortical_ROIs folder
-                os.makedirs(os.path.join(self.var_output_path.get(), "PET_Cortical_ROIs")) # Create PET_Cortical_ROIs folder
+                shutil.rmtree(self.var_output_path.get())
+
+            os.makedirs(self.var_output_path.get())
+            os.makedirs(os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs"))
+            os.makedirs(os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs"))
+            os.makedirs(os.path.join(self.var_output_path.get(), "PET_Subcortical_ROIs"))
+            os.makedirs(os.path.join(self.var_output_path.get(), "PET_Cortical_ROIs"))
         else:
             self.log("\nThe input path does not exists!")
             return
@@ -218,9 +233,9 @@ class ROIpanel:
                 return
 
         # Calculate volume in mm3 from MRI
-        self.log("\nCalculating volume in mm3 from MRI image...")
-
         if self.var_check_analyze_MRI.get():
+            self.log("\nCalculating volume in mm3 from MRI image...")
+
             # Cortical
             try:
                 dir = os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs")
@@ -244,11 +259,12 @@ class ROIpanel:
             
             self.log("Volume calculation completed successfully.")
 
-        # Calculate volume in mm3 from MRI
-        self.log("\nCalculating SUVR from PET image...")
+        # Calculate SUVR from PET
         if self.var_check_analyze_PET.get():
+            self.log("\nCalculating SUVR from PET image...")
+
             # Cortical
-            dir = os.path.join(self.var_output_path.get(), "MRI_Cortical_ROIs")
+            dir = os.path.join(self.var_output_path.get(), "PET_Cortical_ROIs")
             refrence_ROI = self.var_SUVR_ref.get()
             try:
                 for i in range(1, 97):
@@ -261,7 +277,7 @@ class ROIpanel:
                 self.log(f"Error in calculating cortical SUVR:\n{e}")
                 return
             # Subcortical
-            dir = os.path.join(self.var_output_path.get(), "MRI_Subcortical_ROIs")
+            dir = os.path.join(self.var_output_path.get(), "PET_Subcortical_ROIs")
             refrence_ROI = self.var_SUVR_ref.get()
             try:
                 for i in range(1, 20):
@@ -276,34 +292,43 @@ class ROIpanel:
             
             self.log("SUVR calculation completed successfully.")
 
-            # Save the measurements
-            self.log("\nSaving the measurements...")
+        # Save the measurements
+        self.log("\nSaving the measurements...")
 
-            current_dir = os.getcwd()
-            dir = os.path.join(current_dir, "ROI_info") # Where ROI names are saved as txt
+        current_dir = os.getcwd()
+        dir = os.path.join(current_dir, "ROI_info") # Where ROI names are saved as txt
 
-            # Get ROI names
-            path_cortical = os.path.join(dir, "Areas_Cortical.txt") # Cortical ROI names
-            path_subcortical = os.path.join(dir, "Areas_Subcortical.txt") # Subcortical ROI names
-            cortical_ROI_names = pd.read_csv(path_cortical, sep="\t", header=None)
-            subcortical_ROI_names = pd.read_csv(path_subcortical, sep="\t", header=None)
+        # Get ROI names
+        path_cortical = os.path.join(dir, "Areas_Cortical.txt") # Cortical ROI names
+        path_subcortical = os.path.join(dir, "Areas_Subcortical.txt") # Subcortical ROI names
+        cortical_ROI_names = pd.read_csv(path_cortical, sep="\t", header=None)
+        subcortical_ROI_names = pd.read_csv(path_subcortical, sep="\t", header=None)
 
-            # Add ROI names to the dataframes
-            self.MRI_cortical_volume["ROI"] = cortical_ROI_names
-            self.MRI_subcortical_volume["ROI"] = subcortical_ROI_names
-            self.PET_cortical_SUVR["ROI"] = cortical_ROI_names
-            self.PET_subcortical_SUVR["ROI"] = subcortical_ROI_names
+        # Add ROI names to the dataframes
+        self.MRI_cortical_volume["ROI"] = cortical_ROI_names
+        self.MRI_subcortical_volume["ROI"] = subcortical_ROI_names
+        self.PET_cortical_SUVR["ROI"] = cortical_ROI_names
+        self.PET_subcortical_SUVR["ROI"] = subcortical_ROI_names
 
-            # Concat cortical and subcortical as one row
-            all_vol = pd.concat([self.MRI_cortical_volume, self.MRI_subcortical_volume], ignore_index=True)
-            all_suvr = pd.concat([self.PET_cortical_SUVR, self.PET_subcortical_SUVR], ignore_index=True)
-            self.all_measurements = pd.merge(all_vol, all_suvr, on="ROI", how="outer")
+        # Concat cortical and subcortical as one row
+        all_vol = pd.concat([self.MRI_cortical_volume, self.MRI_subcortical_volume], ignore_index=True)
+        all_suvr = pd.concat([self.PET_cortical_SUVR, self.PET_subcortical_SUVR], ignore_index=True)
+        
+        if self.var_check_analyze_MRI.get():
+            self.all_measurements = all_vol.copy()
+            if self.var_check_analyze_PET.get():
+                self.all_measurements = pd.merge(all_vol, all_suvr, on="ROI", how="left")
+        elif self.var_check_analyze_PET.get():
+            self.all_measurements = all_suvr.copy()
+        else:
+            self.all_measurements = pd.DataFrame()
 
-            # Save
-            path = os.path.join(self.var_output_path.get(), "OPETIA_measurements.csv")
-            self.all_measurements.to_csv(path, sep="\t", index=True)
 
-            self.log("Measurements saved successfully.")
+        # Save
+        path = os.path.join(self.var_output_path.get(), "OPETIA_measurements.csv")
+        self.all_measurements.to_csv(path, sep="\t", index=True)
+
+        self.log("Measurements saved successfully.")
 
 
         t2 = time.time()
