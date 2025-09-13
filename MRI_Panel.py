@@ -73,80 +73,98 @@ class MRIPanel:
     def _build_gui(self):
         """Build all widgets inside the parent frame."""
 
-        # Pipeline image
+        # --------------------------------
+        # Configure main grid (2 columns)
+        self.parent.grid_columnconfigure(0, weight=1)  # left side expands
+        self.parent.grid_columnconfigure(1, weight=0)  # right side fixed
+        self.parent.grid_rowconfigure(99, weight=1)    # log box expands vertically
+
+        # --------------------------------
+        # Pipeline image (right side)
         pipeline_image_path = os.path.join(os.getcwd(), "Images", "MRI_proc_pipeline.png")
         if os.path.exists(pipeline_image_path):
             pipeline_image = Image.open(pipeline_image_path)
             w, h = pipeline_image.size
-            scale = 0.44
+            scale = 0.5
             new_w, new_h = int(w * scale), int(h * scale)
             pipeline_image = pipeline_image.resize((new_w, new_h), Image.LANCZOS)
             ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(new_w, new_h))
             label_image = ctk.CTkLabel(master=self.parent, image=ctk_image, text="")
-            label_image.place(x=410, y=5)
+            label_image.grid(row=0, column=1, rowspan=10, sticky="ne", padx=5, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Frame1: Input paths
-        frame1 = ctk.CTkFrame(master=self.parent, width=390, height=150, border_color="#ffffff", border_width=1)
-        frame1.place(x=5, y=5)
+        frame1 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame1.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        frame1.grid_columnconfigure(1, weight=1) # Right side of the frame is exandable
 
-        ctk.CTkLabel(frame1, text="Set T1.nii.gz image address:").place(x=5, y=5)
-        ctk.CTkButton(frame1, text="Browse", width=100, height=25, command=self.set_MRI_address).place(x=5, y=40)
-        ctk.CTkEntry(frame1, textvariable=self.var_mri_path, width=265, height=25).place(x=120, y=40)
+        ctk.CTkLabel(frame1, text="Set T1.nii.gz image address:").grid(row=0, column=0, sticky="w", columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(frame1, text="Browse", command=self.set_MRI_address).grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame1, textvariable=self.var_mri_path).grid(row=1, column=1, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkLabel(frame1, text="Set output folder address:").place(x=5, y=75)
-        ctk.CTkButton(frame1, text="Browse", width=100, height=25, command=self.set_output_address).place(x=5, y=110)
-        ctk.CTkEntry(frame1, textvariable=self.var_output_path, width=265, height=25).place(x=120, y=110)
+        ctk.CTkLabel(frame1, text="Set output folder address:").grid(row=2, column=0, sticky="w", columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(frame1, text="Browse", command=self.set_output_address).grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame1, textvariable=self.var_output_path).grid(row=3, column=1, sticky="ew", padx=5, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Checkbox
-        ctk.CTkCheckBox(master=self.parent, text="Delete previous outputs if exist", variable=self.var_check_delete_outputs, font=("Times New Roman", 15)).place(x=10, y=160)
+        ctk.CTkCheckBox(
+            master=self.parent,
+            text="Delete previous outputs if exist",
+            variable=self.var_check_delete_outputs,
+            font=("Times New Roman", 15)
+        ).grid(row=1, column=0, sticky="w", padx=10, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Frame2: MRI Modality
-        frame2 = ctk.CTkFrame(master=self.parent, width=390, height=45, border_color="#ffffff", border_width=1)
-        frame2.place(x=5, y=190)
-        ctk.CTkLabel(frame2, text="MRI image modality:", font=("Times New Roman", 15)).place(x=5, y=5)
-        combobox1 = ctk.CTkComboBox(frame2, width=235, height=25,
+        frame2 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame2.grid(row=2, column=0, sticky="ew", padx=5, pady=5)
+        frame2.grid_columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(frame2, text="MRI image modality:", font=("Times New Roman", 15)).grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        combobox1 = ctk.CTkComboBox(frame2,
                                     values=["T1 weigted", "T2 weighted", "FLAIR"],
                                     command=self.set_modality,
                                     variable=self.var_mri_modality)
-        combobox1.place(x=150, y=10)
+        combobox1.grid(row=0, column=1, sticky="ew", padx=5, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Frame3: Registration options
-        frame3 = ctk.CTkFrame(master=self.parent, width=390, height=135, border_color="#ffffff", border_width=1)
-        frame3.place(x=5, y=240)
+        frame3 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame3.grid(row=3, column=0, sticky="ew", padx=5, pady=5)
+        frame3.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(frame3, text="Select Registration Class:", font=("Times New Roman", 15)).place(x=5, y=5)
-        combobox2 = ctk.CTkComboBox(frame3, width=380,
+        ctk.CTkLabel(frame3, text="Select Registration Class:", font=("Times New Roman", 15)).grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        combobox2 = ctk.CTkComboBox(frame3,
                                     values=["Nonlinear", "Linear"],
                                     variable=self.var_reg_class,
                                     command=self.set_reg_combo_box_type)
-        combobox2.place(x=5, y=35)
+        combobox2.grid(row=1, column=0, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkLabel(frame3, text="Select Registration Type:", font=("Times New Roman", 15)).place(x=5, y=65)
-        self.combobox3 = ctk.CTkComboBox(frame3, width=380,
+        ctk.CTkLabel(frame3, text="Select Registration Type:", font=("Times New Roman", 15)).grid(row=2, column=0, sticky="w", padx=5, pady=5)
+        self.combobox3 = ctk.CTkComboBox(frame3,
                                          values=list(self.nonlinear_options_dict.keys()),
                                          variable=self.var_reg_type,
                                          command=self.set_reg_type)
-        self.combobox3.place(x=5, y=95)
+        self.combobox3.grid(row=3, column=0, sticky="ew", padx=5, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Processing buttons
         ctk.CTkButton(
-            master=self.parent, text="Process data", width=390, height=25,
+            master=self.parent, text="Process data",
             command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
-        ).place(x=5, y=380)
+        ).grid(row=4, column=0, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkButton(master=self.parent, text="Show registration result", width=390, height=25, command=self.btn_show_reg_result).place(x=5, y=410)
-        ctk.CTkButton(master=self.parent, text="Show segmentation results", width=390, height=25, command=self.btn_show_seg_result).place(x=5, y=440)
+        ctk.CTkButton(master=self.parent, text="Show registration result", command=self.btn_show_reg_result)\
+            .grid(row=5, column=0, sticky="ew", padx=5, pady=5)
+        ctk.CTkButton(master=self.parent, text="Show segmentation results", command=self.btn_show_seg_result)\
+            .grid(row=6, column=0, sticky="ew", padx=5, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Log box (console)
-        self.print_box = ctk.CTkTextbox(master=self.parent, width=1010, height=300)
-        self.print_box.place(x=5, y=480)
-        self.print_box.configure(state="disabled")  # Start as read-only
+        self.print_box = ctk.CTkTextbox(master=self.parent)
+        self.print_box.grid(row=99, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        self.print_box.configure(state="disabled")
 
 
     # -------------------------------

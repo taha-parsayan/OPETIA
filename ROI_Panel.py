@@ -82,75 +82,85 @@ class ROIpanel:
     # GUI Layout
     # -------------------------------
     def _build_gui(self):
+        """Build all widgets inside the parent frame."""
 
-        # Pipeline image
+        # Configure grid layout for parent
+        self.parent.grid_columnconfigure(0, weight=1)  # left column expands
+        self.parent.grid_columnconfigure(1, weight=0)  # right column fixed
+        self.parent.grid_rowconfigure(99, weight=1)    # log box expands vertically
+
+        # -------------------------------
+        # Pipeline image (right side)
         pipeline_image_path = os.path.join(os.getcwd(), "Images", "ROI_pipeline.png")
         if os.path.exists(pipeline_image_path):
             pipeline_image = Image.open(pipeline_image_path)
             w, h = pipeline_image.size
-            scale = 0.44
+            scale = 0.45
             new_w, new_h = int(w * scale), int(h * scale)
             pipeline_image = pipeline_image.resize((new_w, new_h), Image.LANCZOS)
             ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(new_w, new_h))
             label_image = ctk.CTkLabel(master=self.parent, image=ctk_image, text="")
-            label_image.place(x=410, y=5)
-        
+            label_image.grid(row=0, column=1, rowspan=6, sticky="ne", padx=5, pady=5)
+
         # -------------------------------
         # Frame1: Input paths
-        frame1 = ctk.CTkFrame(master=self.parent, width=390, height=150, border_color="#ffffff", border_width=1)
-        frame1.place(x=5, y=5)
+        frame1 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame1.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        frame1.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(frame1, text="Set folder address containing processed images:").place(x=5, y=5)
-        ctk.CTkButton(frame1, text="Browse", width=100, height=25, command=self.set_input_address).place(x=5, y=40)
-        ctk.CTkEntry(frame1, textvariable=self.var_input_path, width=265, height=25).place(x=120, y=40)
+        ctk.CTkLabel(frame1, text="Set folder address containing processed images:").grid(row=0, column=0, columnspan=2, sticky="w", padx=5, pady=5)
+        ctk.CTkButton(frame1, text="Browse", command=self.set_input_address).grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame1, textvariable=self.var_input_path).grid(row=1, column=1, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkLabel(frame1, text="Set output folder address:").place(x=5, y=75)
-        ctk.CTkButton(frame1, text="Browse", width=100, height=25, command=self.set_output_address).place(x=5, y=110)
-        ctk.CTkEntry(frame1, textvariable=self.var_output_path, width=265, height=25).place(x=120, y=110)
+        ctk.CTkLabel(frame1, text="Set output folder address:").grid(row=2, column=0, columnspan=2, sticky="w", padx=5, pady=5)
+        ctk.CTkButton(frame1, text="Browse", command=self.set_output_address).grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame1, textvariable=self.var_output_path).grid(row=3, column=1, sticky="ew", padx=5, pady=5)
 
         # -------------------------------
         # Frame2: SUVR reference region
-        frame2 = ctk.CTkFrame(master=self.parent, width=390, height=75, border_color="#ffffff", border_width=1)
-        frame2.place(x=5, y=165)
+        frame2 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame2.grid(row=1, column=0, sticky="ew", padx=5, pady=5)
+        frame2.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(frame2, text="Set the SUVR reference region:").place(x=5, y=5)
-        ctk.CTkComboBox(frame2, width=380, height=25,
-                            values=self.SUVR_ref,
-                            variable=self.var_SUVR_ref,
-                            ).place(x=5, y=40)
-        
+        ctk.CTkLabel(frame2, text="Set the SUVR reference region:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkComboBox(frame2, values=self.SUVR_ref, variable=self.var_SUVR_ref).grid(row=1, column=0, sticky="ew", padx=5, pady=5)
+
         # -------------------------------
-        # Frame3: SUVR reference region
-        frame3 = ctk.CTkFrame(master=self.parent, width=390, height=75, border_color="#ffffff", border_width=1)
-        frame3.place(x=5, y=250)
+        # Frame3: Brain atlas
+        frame3 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame3.grid(row=2, column=0, sticky="ew", padx=5, pady=5)
+        frame3.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(frame3, text="Select the brain atlas:").place(x=5, y=5)
-        ctk.CTkComboBox(frame3, width=380, height=25,
-                            values=self.atlas_list,
-                            variable=self.var_atlas,
-                            ).place(x=5, y=40)
-        
+        ctk.CTkLabel(frame3, text="Select the brain atlas:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkComboBox(frame3, values=self.atlas_list, variable=self.var_atlas).grid(row=1, column=0, sticky="ew", padx=5, pady=5)
+
         # -------------------------------
-        # Frame4: SUVR reference region
-        frame4 = ctk.CTkFrame(master=self.parent, width=390, height=75, border_color="#ffffff", border_width=1)
-        frame4.place(x=5, y=335)
+        # Frame4: Analysis options
+        frame4 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame4.grid(row=3, column=0, sticky="ew", padx=5, pady=5)
+        frame4.grid_columnconfigure(0, weight=1)
 
-        # Checkbox
-        ctk.CTkCheckBox(master=frame4, text="Analyze MRI image", variable=self.var_check_analyze_MRI, font=("Times New Roman", 15)).place(x=10, y=10)
-        ctk.CTkCheckBox(master=frame4, text="Analyze PET image", variable=self.var_check_analyze_PET, font=("Times New Roman", 15)).place(x=10, y=40)
-        
+        ctk.CTkCheckBox(frame4, text="Analyze MRI image", variable=self.var_check_analyze_MRI, font=("Times New Roman", 15)).grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        ctk.CTkCheckBox(frame4, text="Analyze PET image", variable=self.var_check_analyze_PET, font=("Times New Roman", 15)).grid(row=1, column=0, sticky="w", padx=10, pady=5)
+
         #-------------------------------------
         # Processing buttons
-        ctk.CTkButton(master=self.parent, text="Process data", width=390, height=25, 
-                             command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
-                             ).place(x=5, y=415)
-        ctk.CTkButton(master=self.parent, text="Show the measurements", width=390, height=25, command=self.show_measurements).place(x=5, y=445)
-        
+        ctk.CTkButton(
+            self.parent, text="Process data", 
+            command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
+        ).grid(row=4, column=0, sticky="ew", padx=5, pady=5)
+
+        ctk.CTkButton(
+            self.parent, text="Show the measurements", 
+            command=self.show_measurements
+        ).grid(row=5, column=0, sticky="ew", padx=5, pady=5)
+
         # -------------------------------
         # Log box (console)
-        self.print_box = ctk.CTkTextbox(master=self.parent, width=1010, height=300)
-        self.print_box.place(x=5, y=480)
-        self.print_box.configure(state="disabled")  # Start as read-only
+        self.print_box = ctk.CTkTextbox(master=self.parent)
+        self.print_box.grid(row=99, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        self.print_box.configure(state="disabled")
+
 
     # -------------------------------
     # Functions

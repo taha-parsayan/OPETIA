@@ -56,83 +56,103 @@ class PETPanel:
 
     # -------------------------------
     # GUI Layout
-    # -------------------------------
+    # -------------------------------    
     def _build_gui(self):
         """Build all widgets inside the parent frame."""
 
-        # Pipeline image
+        # --------------------------------
+        # Configure main grid (2 columns)
+        self.parent.grid_columnconfigure(0, weight=1)  # left side expands
+        self.parent.grid_columnconfigure(1, weight=0)  # right side fixed
+        self.parent.grid_rowconfigure(99, weight=1)    # log box expands vertically
+
+        # --------------------------------
+        # Pipeline image (right side)
         pipeline_image_path = os.path.join(os.getcwd(), "Images", "PET_proc_pipeline.png")
         if os.path.exists(pipeline_image_path):
             pipeline_image = Image.open(pipeline_image_path)
             w, h = pipeline_image.size
-            scale = 0.49
+            scale = 0.55
             new_w, new_h = int(w * scale), int(h * scale)
             pipeline_image = pipeline_image.resize((new_w, new_h), Image.LANCZOS)
             ctk_image = ctk.CTkImage(dark_image=pipeline_image, size=(new_w, new_h))
             label_image = ctk.CTkLabel(master=self.parent, image=ctk_image, text="")
-            label_image.place(x=410, y=5)
+            label_image.grid(row=0, column=1, rowspan=10, sticky="ne", padx=5, pady=5)
 
-        # -------------------------------
+        # --------------------------------
         # Frame1: Input path
-        frame1 = ctk.CTkFrame(master=self.parent, width=390, height=150, border_color="#ffffff", border_width=1)
-        frame1.place(x=5, y=5)
+        frame1 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame1.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        frame1.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(master=frame1, text="Set folder containing the PET volume(s):", font=("Times New Roman", 15)).place(x=5, y=5)
-        ctk.CTkButton(master=frame1, text="Browse", width=100, height=25, command=self.set_PET_folder).place(x=5, y=40)
-        ctk.CTkEntry(master=frame1, textvariable = self.var_pet_path, width = 265, height=25).place(x=120, y=40)
-        ctk.CTkLabel(master=frame1, text="Set output folder address:", font=("Times New Roman", 15)).place(x=5, y=75)
-        ctk.CTkButton(master=frame1, text="Browse", width=100, height=25, command=self.set_output_address).place(x=5, y=110)
-        ctk.CTkEntry(master=frame1, textvariable=self.var_output_path, width = 265, height=25).place(x=120, y=110)
+        ctk.CTkLabel(frame1, text="Set folder containing the PET volume(s):").grid(row=0, column=0, sticky="w", columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(frame1, text="Browse", command=self.set_PET_folder).grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame1, textvariable=self.var_pet_path).grid(row=1, column=1, sticky="ew", padx=5, pady=5)
 
-        #------------------------------
+        ctk.CTkLabel(frame1, text="Set output folder address:").grid(row=2, column=0, sticky="w", columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(frame1, text="Browse", command=self.set_output_address).grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame1, textvariable=self.var_output_path).grid(row=3, column=1, sticky="ew", padx=5, pady=5)
+
+        # ------------------------------
         # Frame 2: Co-registration type
+        frame2 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame2.grid(row=1, column=0, sticky="ew", padx=5, pady=5)
+        frame2.grid_columnconfigure(0, weight=1)
 
-        frame2 = ctk.CTkFrame(master=self.parent, width=390, height=75, border_color="#ffffff", border_width=1)
-        frame2.place(x=5, y=165)
+        ctk.CTkLabel(frame2, text="Co-registration type (PET to T1):").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkComboBox(frame2,
+                        values=list(self.linear_options_dict.keys()),
+                        variable=self.var_reg_type,
+                        command=self.set_reg_type).grid(row=1, column=0, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkLabel(master=frame2, text="Co-registration type (PET to T1):", font=("Times New Roman", 15)).place(x=5, y=5)
-        ctk.CTkComboBox(master=frame2, width=380, values=list(self.linear_options_dict.keys()),
-                                        variable=self.var_reg_type,
-                                        command=self.set_reg_type).place(x=5, y=35)
-
-        #------------------------------
+        # ------------------------------
         # Frame 3: Registration matrix
+        frame3 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame3.grid(row=2, column=0, sticky="ew", padx=5, pady=5)
+        frame3.grid_columnconfigure(1, weight=1)
 
-        frame3 = ctk.CTkFrame(master=self.parent, width=390, height=130, border_color="#ffffff", border_width=1)
-        frame3.place(x=5, y=250)
+        ctk.CTkLabel(frame3, text="Folder containing MRI brain masks:").grid(row=0, column=0, sticky="w", columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(frame3, text="Browse", command=self.set_brain_mask_address).grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame3, textvariable=self.var_MRI_masks_folder).grid(row=1, column=1, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkLabel(master=frame3, text="Folder containing MRI brain masks:", font=("Times New Roman", 15)).place(x=5, y=5)
-        ctk.CTkButton(master=frame3, text="Browse", width=100, height=25, command=self.set_brain_mask_address).place(x=5, y=35)
-        ctk.CTkEntry(master=frame3, textvariable=self.var_MRI_masks_folder, width = 265, height=25).place(x=120, y=35)
-        ctk.CTkLabel(master=frame3, text="Folder containing MRI native-to-MNI registration matrix:", font=("Times New Roman", 15)).place(x=5, y=65)
-        ctk.CTkButton(master=frame3, text="Browse", width=100, height=25, command=self.set_reg_matrix_address).place(x=5, y=95)
-        ctk.CTkEntry(master=frame3, textvariable=self.var_MRI_reg_matrix_folder, width = 265, height=25).place(x=120, y=95)
+        ctk.CTkLabel(frame3, text="Folder containing MRI native-to-MNI registration matrix:").grid(row=2, column=0, sticky="w", columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(frame3, text="Browse", command=self.set_reg_matrix_address).grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        ctk.CTkEntry(frame3, textvariable=self.var_MRI_reg_matrix_folder).grid(row=3, column=1, sticky="ew", padx=5, pady=5)
 
         # ---------------------------
-        # Frame4: smoothing
-        frame4 = ctk.CTkFrame(master=self.parent, width=390, height=35, border_color="#ffffff", border_width=1)
-        frame4.place(x=5, y=390)
+        # Frame4: Smoothing
+        frame4 = ctk.CTkFrame(master=self.parent, border_color="#ffffff", border_width=1)
+        frame4.grid(row=3, column=0, sticky="ew", padx=5, pady=5)
+        frame4.grid_columnconfigure(0, weight=0)
+        frame4.grid_columnconfigure(1, weight=0)   
+        frame4.grid_columnconfigure(2, weight=0)   
 
-        ctk.CTkCheckBox(master=frame4, text="Gaussian smoothing with FWHM of",
-                                command = self.var_check_smooth,
-                                variable = self.var_check_smooth, font=("Times New Roman", 15)).place(x=5, y=5)
-        ctk.CTkEntry(master=frame4, textvariable=self.var_smooth_FWHM, width = 40, height=25).place(x=260, y=5)
-        ctk.CTkLabel(master=frame4, text="mm", font=("Times New Roman", 15)).place(x=305, y=5)
+        ctk.CTkCheckBox(frame4,
+                        text="Gaussian smoothing with FWHM of",
+                        variable=self.var_check_smooth,
+                        command=self.var_check_smooth).grid(row=0, column=0, sticky="w", padx=5, pady=5)
 
-        #-------------------------------------
+        ctk.CTkEntry(frame4, textvariable=self.var_smooth_FWHM, width=40).grid(row=0, column=1, sticky="w", padx=5, pady=5)
+        ctk.CTkLabel(frame4, text="mm").grid(row=0, column=2, sticky="w", padx=5, pady=5)
+
+        # -------------------------------------
         # Processing buttons
+        ctk.CTkButton(
+            master=self.parent, text="Process data",
+            command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
+        ).grid(row=4, column=0, sticky="ew", padx=5, pady=5)
 
-        ctk.CTkButton(master=self.parent, text="Process data", width=390, height=25, 
-                             command=lambda: threading.Thread(target=self.btn_process_data, daemon=True).start()
-                             ).place(x=5, y=430)
-        ctk.CTkButton(master=self.parent, text="Show registration result", width=390, height=25, command=self.btn_show_reg_result).place(x=5, y=460)
-        ctk.CTkButton(master=self.parent, text="Show segmentation results", width=390, height=25, command=self.btn_show_seg_result).place(x=5, y=490)
+        ctk.CTkButton(master=self.parent, text="Show registration result", command=self.btn_show_reg_result)\
+            .grid(row=5, column=0, sticky="ew", padx=5, pady=5)
+        ctk.CTkButton(master=self.parent, text="Show segmentation results", command=self.btn_show_seg_result)\
+            .grid(row=6, column=0, sticky="ew", padx=5, pady=5)
 
         # -------------------------------
         # Log box (console)
-        self.print_box = ctk.CTkTextbox(master=self.parent, width=1090, height=250)
-        self.print_box.place(x=5, y=530)
-        self.print_box.configure(state="disabled")  # Start as read-only
+        self.print_box = ctk.CTkTextbox(master=self.parent)
+        self.print_box.grid(row=99, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        self.print_box.configure(state="disabled")
+
 
     # -------------------------------
     # Functions
