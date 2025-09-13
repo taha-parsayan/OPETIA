@@ -15,7 +15,7 @@ import sys
 import time
 import shutil
 import customtkinter as ctk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 from PIL import Image
 import Image_Processing_Functions as ipf
 import threading

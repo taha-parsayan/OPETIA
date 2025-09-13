@@ -8,13 +8,9 @@ Author: Taha Parsayan
 #------------------------------
 import os
 import subprocess
-import time
-import shutil
 import customtkinter as ctk
-from tkinter import filedialog
 import tkinter.messagebox as messagebox
 from PIL import Image
-import Image_Processing_Functions as ipf
 from tkinter import PhotoImage
 from MRI_Panel import MRIPanel
 from PET_Panel import PETPanel
