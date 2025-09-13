@@ -7,6 +7,7 @@ Author: Taha Parsayan
 # Import Libraries
 #------------------------------
 import os
+import subprocess
 import time
 import shutil
 import customtkinter as ctk
@@ -18,6 +19,7 @@ from tkinter import PhotoImage
 from MRI_Panel import MRIPanel
 from PET_Panel import PETPanel
 from ROI_Panel import ROIpanel
+import platform
 
 #------------------------------
 # GUI Setup
@@ -54,6 +56,19 @@ def show_panel(panel_name):
         panel.pack_forget()   # hide all panels
     panels[panel_name].pack(fill="both", expand=True, padx=10, pady=10)
 
+def open_MRIcroGL():
+    os_type = platform.system()
+
+    if os_type == "Darwin":
+        # Path to the .app bundle
+        app_path = os.path.join(current_dir, "MRIcroGL", "MacOS", "MRIcroGL.app")
+
+        # The actual executable is inside Contents/MacOS/
+        exec_path = os.path.join(app_path, "Contents", "MacOS", "MRIcroGL")
+
+        # Launch the app
+        subprocess.Popen([exec_path])
+
 #------------------------------
 # Layout: Left + Right
 #------------------------------
@@ -82,15 +97,17 @@ logo_img = ctk.CTkImage(dark_image=logo_img, size=(new_w, new_h))
 logo_label = ctk.CTkLabel(master=left_panel, image=logo_img, text="")
 logo_label.pack(padx=20, pady=20)
 
-# Navigation buttons
 btn1 = ctk.CTkButton(master=left_panel, text="MRI Image Processing", fg_color="black", command=lambda: show_panel("mri"))
-btn1.pack(padx=10, pady=5)
+btn1.pack(fill="x", padx=10, pady=5)
 
 btn2 = ctk.CTkButton(master=left_panel, text="PET Image Processing", fg_color="black", command=lambda: show_panel("pet"))
-btn2.pack(padx=10,pady=5)
+btn2.pack(fill="x", padx=10, pady=5)
 
 btn3 = ctk.CTkButton(master=left_panel, text="ROI Feature Extraction", fg_color="black", command=lambda: show_panel("roi"))
-btn3.pack(padx=10,pady=5)
+btn3.pack(fill="x", padx=10, pady=5)
+
+btn4 = ctk.CTkButton(master=left_panel, text="Visualization", fg_color="black", command=open_MRIcroGL)
+btn4.pack(fill="x", padx=10, pady=5)
 
 #------------------------------
 # Right Panel Pages
