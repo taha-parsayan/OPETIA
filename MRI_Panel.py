@@ -34,9 +34,6 @@ class MRIPanel:
         self.log("OPETIA is ready to analyze your data!")
         self.log("Analyze log will be printed here.")
 
-        # Download MRIcroGL if not exists
-        
-
     # -------------------------------
     # Variables
     # -------------------------------
