@@ -12,16 +12,18 @@ OPETIA is a user-friendly PET/MRI (Positron Emission Tomography / Magnetic Reson
 
 OPETIA can be run on:
 - Windows
-- Linux
+- Linux Ubuntu
 - MacOS
 
 OPETIA offers a graphical user interface (GUI) to process images and calculate cerebral volume from MRI images and SUVR (Standardized Uptake Value ratio) from PET images. Image processing with OPETIA does not require users to have previous knowledge of medical image processing or programming since all the parameters for both MRI and PET image pre-processing are already set by default. At the same time, these parameters are provided in the GUI so that the users can modify them if needed.
 
 The inputs of OPETIA include MRI T1-weighted and dynamic PET.
 The outputs of OPETIA include SUVR (min, mean, max) and cortical volume (mean) of the regions of interest (ROI).
-The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain stem) ROIs have been selected as the default brain atlas for OPETIA. We have divided the regions into left and right hemispheres, resulting in 96 cortical and 19 subcortical ROIs.
+The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain stem) ROIs have been selected as the default brain atlas for OPETIA. I have divided the regions into left and right hemispheres, resulting in 96 cortical and 19 subcortical ROIs.
 
 <img width="1470" height="838" alt="Image" src="https://github.com/user-attachments/assets/7cc2fd2d-fdbd-42b5-9241-a0df342ffbe0" />
+<img width="1470" height="830" alt="Image" src="https://github.com/user-attachments/assets/e3646ae6-ecca-4375-bd0a-4b4fa4d12ec8" />
+<img width="719" height="472" alt="Image" src="https://github.com/user-attachments/assets/b8bfa2f4-1327-4859-a873-94565e9f0559" />
 
 ## Tools
 OPETIA contains the following tools:
@@ -34,13 +36,70 @@ Every tool within OPETIA is provided with the flowchart of the data processing, 
 Additionally, the log box within OPETIA prints the data processing stages for monitoring and error handling.
 
 ## How to use
-### Initializations
+### Download OPETIA
 
-- Install the latest version of Python
-- Run this code in a terminal: git clone https://github.com/taha-parsayan/OPETIA.git
+- Install Python version 3.12
+- Open a Terminal and run the following code to download OPETIA:
 
-Next, open a terminal in the OPETIA folder and run the following command:
-- python3 OPETIA.py
+```bash
+git clone https://github.com/taha-parsayan/OPETIA.git
+```
+
+### Install packages for macOS
+ 
+Open a Terminal and run:
+
+```bash
+cd OPETIA
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Run OPETIA on macOS:
+
+Then run OPETIA using:
+
+```bash
+source .venv/bin/activate
+python OPETIA.py
+```
+
+### Install packages for Ubuntu
+
+Open a Terminal and run:
+
+```bash
+cd OPETIA
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Run OPETIA on Ubuntu:
+
+```bash
+source .venv/bin/activate
+python OPETIA.py
+```
+
+### Install packages for Windows
+
+Open a Terminal and run:
+
+```bash
+cd OPETIA
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Run OPETIA on Windows:
+
+```bash
+source .venv/bin/activate
+python OPETIA.py
+```
 
 ## Citation
 Please cite the following paper:
