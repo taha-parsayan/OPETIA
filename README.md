@@ -16,7 +16,7 @@ The inputs of OPETIA include MRI T1-weighted and dynamic PET.
 The outputs of OPETIA include SUVR (min, mean, max) and cortical volume (mean) of the regions of interest (ROI).
 The Harvard-Oxford atlas with 48 cortical and 10 subcortical (including brain stem) ROIs have been selected as the default brain atlas for OPETIA. We have divided the regions into left and right hemispheres, resulting in 96 cortical and 19 subcortical ROIs.
 
-![Image](img width="1470" height="838" alt="Image" src="https://github.com/user-attachments/assets/7cc2fd2d-fdbd-42b5-9241-a0df342ffbe0")
+<img width="1470" height="838" alt="Image" src="https://github.com/user-attachments/assets/7cc2fd2d-fdbd-42b5-9241-a0df342ffbe0" />
 
 ## Tools
 OPETIA contains the following tools:
