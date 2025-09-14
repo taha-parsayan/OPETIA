@@ -53,6 +53,8 @@ cd OPETIA
 
 #### macOS
 
+Install Packages:
+
 ```bash
 # Create a virtual environment
 python3.12 -m venv .venv
@@ -60,14 +62,21 @@ source .venv/bin/activate
 
 # Install required packages
 pip install -r requirements_macos.txt
+```
 
+Run OPETIA:
+
+```bash
 # Run OPETIA
+source .venv/bin/activate
 python OPETIA.py
 ```
 
 ---
 
 #### Ubuntu
+
+Install Packages:
 
 ```bash
 # Create a virtual environment
@@ -76,8 +85,13 @@ source .venv/bin/activate
 
 # Install required packages
 pip install -r requirements_ubuntu.txt
+```
 
+Run OPETIA:
+
+```bash
 # Run OPETIA
+source .venv/bin/activate
 python OPETIA.py
 ```
 
@@ -85,10 +99,13 @@ python OPETIA.py
 
 #### Windows
 
+Install Packages:
+
 ```bash
 # Create a virtual environment
 python -m venv .venv
 .\.venv\Scripts\activate
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 # Install required packages
 pip install customtkinter
@@ -99,8 +116,13 @@ pip install antspynet
 pip install antspyx
 pip install nibabel
 pip install matplotlib
+```
 
+Run OPETIA:
+
+```bash
 # Run OPETIA
+.\.venv\Scripts\activate
 python OPETIA.py
 ```
 
