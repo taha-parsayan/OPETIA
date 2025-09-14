@@ -35,62 +35,62 @@ OPETIA contains the following tools:
 Every tool within OPETIA is provided with the flowchart of the data processing, including the input data and the output data.
 Additionally, the log box within OPETIA prints the data processing stages for monitoring and error handling.
 
-## How to use
-### Download OPETIA
+## How to Use OPETIA
 
-- Install Python version 3.12
-- Open a Terminal and run the following code to download OPETIA:
+### 1. Download OPETIA
+
+1. Install **Python 3.12** on your system.
+2. Open a terminal and run:
 
 ```bash
 git clone https://github.com/taha-parsayan/OPETIA.git
+cd OPETIA
 ```
 
-### Install packages for macOS
- 
-Open a Terminal and run:
+---
+
+### 2. Install Packages and Run OPETIA
+
+#### macOS
 
 ```bash
-cd OPETIA
+# Create a virtual environment
 python3.12 -m venv .venv
 source .venv/bin/activate
+
+# Install required packages
 pip install -r requirements_macos.txt
-```
 
-### Run OPETIA on macOS:
-
-Then run OPETIA using:
-
-```bash
-source .venv/bin/activate
+# Run OPETIA
 python OPETIA.py
 ```
 
-### Install packages for Ubuntu
+---
 
-Open a Terminal and run:
+#### Ubuntu
 
 ```bash
-cd OPETIA
+# Create a virtual environment
 python3.12 -m venv .venv
 source .venv/bin/activate
+
+# Install required packages
 pip install -r requirements_ubuntu.txt
-```
 
-### Run OPETIA on Ubuntu:
-
-```bash
-source .venv/bin/activate
+# Run OPETIA
 python OPETIA.py
 ```
 
-### Install packages for Windows
+---
 
-Open a Terminal and run:
+#### Windows
 
 ```bash
-cd OPETIA
+# Create a virtual environment
 python -m venv .venv
 .\.venv\Scripts\activate
+
+# Install required packages
 pip install customtkinter
 pip install numpy
 pip install pillow
@@ -99,12 +99,8 @@ pip install antspynet
 pip install antspyx
 pip install nibabel
 pip install matplotlib
-```
 
-### Run OPETIA on Windows:
-
-```bash
-source .venv/bin/activate
+# Run OPETIA
 python OPETIA.py
 ```
 

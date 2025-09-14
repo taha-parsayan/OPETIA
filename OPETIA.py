@@ -65,6 +65,26 @@ def open_MRIcroGL():
         # Launch the app
         subprocess.Popen([exec_path])
 
+    elif os_type == "Windows":
+        # Windows
+        # Assuming MRIcroGL.exe is in MRIcroGL folder in the current directory
+        exec_path = os.path.join(current_dir, "MRIcroGL", "Windows", "MRIcroGL.exe")
+        if os.path.exists(exec_path):
+            subprocess.Popen([exec_path])
+        else:
+            print(f"Executable not found: {exec_path}")
+
+    elif os_type == "Linux":
+        # Linux
+        exec_path = os.path.join(current_dir, "MRIcroGL", "Linux", "MRIcroGL")
+        if os.path.exists(exec_path):
+            subprocess.Popen([exec_path])
+        else:
+            print(f"Executable not found: {exec_path}")
+
+    else:
+        print(f"Unsupported OS: {os_type}")
+
 #------------------------------
 # Layout: Left + Right
 #------------------------------
