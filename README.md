@@ -73,7 +73,7 @@ Open a Terminal and run:
 cd OPETIA
 python3.12 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements_macos.txt
 ```
 
 ### Run OPETIA on Ubuntu:
@@ -91,7 +91,7 @@ Open a Terminal and run:
 cd OPETIA
 python -m venv .venv
 .\.venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements_windows.txt
 ```
 
 ### Run OPETIA on Windows:
