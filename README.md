@@ -104,8 +104,8 @@ Install Packages:
 ```bash
 # Create a virtual environment
 python -m venv .venv
-.\.venv\Scripts\activate
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\activate
 
 # Install required packages
 pip install customtkinter
@@ -122,6 +122,7 @@ Run OPETIA:
 
 ```bash
 # Run OPETIA
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\activate
 python OPETIA.py
 ```
