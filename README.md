@@ -91,7 +91,14 @@ Open a Terminal and run:
 cd OPETIA
 python -m venv .venv
 .\.venv\Scripts\activate
-pip install -r requirements_windows.txt
+pip install customtkinter
+pip install numpy
+pip install pillow
+pip install pandas
+pip install antspynet
+pip install antspyx
+pip install nibabel
+pip install matplotlib
 ```
 
 ### Run OPETIA on Windows:
