@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Unipro UGENE
+Comment=Unipro UGENE is a cross-platform visual environment for DNA and protein sequence analysis.
+Exec=/home/chris/MRIcroGL/MRIcroGL_QT
+Path=/home/chris/MRIcroGL
+Icon=/home/chris/MRIcroGL/Resources/mricrogl.svg
+Terminal=false
+Type=Application
+Categories=Utility;Development;
