@@ -1,0 +1,10 @@
+customtkinter
+Pillow
+pandas
+numpy
+ants
+antspynet
+nibabel
+matplotlib
+tensorflow>=2.16
+tensorflow-probability[tf]
