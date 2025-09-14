@@ -17,5 +17,5 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install -r requirements_ubuntu.txt
-      - name: Run OPETIA
-        run: python OPETIA.py
+      - name: Run function library
+        run: python Image_Processing_Functions.py
