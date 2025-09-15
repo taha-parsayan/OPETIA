@@ -8,19 +8,22 @@ on:
 
 jobs:
   run_opetia:
-    runs-on: macos-latest   # or ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniforge-version: "latest"   # <-- install Miniforge automatically
+          miniforge-version: "latest"
           auto-update-conda: true
           python-version: 3.12
-          activate-environment: opetia
-          environment-file: environment.yml
-          use-mamba: true   # faster solver
+          use-mamba: true
 
-      - name: Run function library
-        run: python Image_Processing_Functions.py
+      - name: Create OPETIA environment
+        run: conda env create -f environment.yml
+
+      - name: Activate OPETIA environment
+        run: |
+          conda activate opetia
+          python Image_Processing_Functions.py
