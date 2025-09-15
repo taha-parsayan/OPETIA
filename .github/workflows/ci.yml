@@ -23,7 +23,5 @@ jobs:
       - name: Create OPETIA environment
         run: conda env create -f environment.yml
 
-      - name: Activate OPETIA environment
-        run: |
-          conda activate opetia
-          python Image_Processing_Functions.py
+      - name: Run function library
+        run: conda run -n opetia python Image_Processing_Functions.py
