@@ -1,0 +1,20 @@
+name: opetia
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - scikit-image
+  - nibabel
+  - scikit-learn
+  - pip
+  - pip:
+      - antspyx
+      - antspynet
+      - ctk
+      - customtkinter
+      - tensorflow
