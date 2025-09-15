@@ -39,7 +39,8 @@ Additionally, the log box within OPETIA prints the data processing stages for mo
 
 ### 1. Download OPETIA
 
-1. Install **Python 3.12** on your system.
+1. Install **Conda** from the official website: [https://docs.conda.io/en/latest/miniconda.html](https://docs.conda.io/en/latest/miniconda.html)
+   (Choose Miniconda for your OS: Windows, macOS, or Linux.)
 2. Open a terminal and run:
 
 ```bash
@@ -49,83 +50,34 @@ cd OPETIA
 
 ---
 
-### 2. Install Packages and Run OPETIA
+### 2. Create Conda Environment, Install Packages, and Run OPETIA
 
-#### macOS
+#### All Platforms (Windows / macOS / Linux)
 
-Install Packages:
+1. **Create the Conda environment**:
 
 ```bash
-# Create a virtual environment
-python3.12 -m venv .venv
-source .venv/bin/activate
-
-# Install required packages
-pip install -r requirements_macos.txt
+conda env create -f environment.yml
 ```
 
-Run OPETIA:
+2. **Activate the environment**:
 
 ```bash
-# Run OPETIA
-source .venv/bin/activate
+conda activate opetia
+```
+
+3. **Run OPETIA**:
+
+```bash
 python OPETIA.py
 ```
 
 ---
 
-#### Ubuntu
+### Notes
 
-Install Packages:
-
-```bash
-# Create a virtual environment
-python3.12 -m venv .venv
-source .venv/bin/activate
-
-# Install required packages
-pip install -r requirements_ubuntu.txt
-```
-
-Run OPETIA:
-
-```bash
-# Run OPETIA
-source .venv/bin/activate
-python OPETIA.py
-```
-
----
-
-#### Windows
-
-Install Packages:
-
-```bash
-# Create a virtual environment
-python -m venv .venv
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\activate
-
-# Install required packages
-pip install customtkinter
-pip install numpy
-pip install pillow
-pip install pandas
-pip install antspynet
-pip install antspyx
-pip install nibabel
-pip install matplotlib
-```
-
-Run OPETIA:
-
-```bash
-# Run OPETIA
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\activate
-python OPETIA.py
-```
+* The Conda environment includes Python 3.12 and all required packages (`numpy`, `pandas`, `matplotlib`, `nibabel`, `antspyx`, `antspynet`, `customtkinter`, etc.).
+* On macOS with M1/M2, TensorFlow will use the `tensorflow-macos` + `tensorflow-metal` stack for hardware acceleration.
 
 ## Citation
 Please cite the following paper:
