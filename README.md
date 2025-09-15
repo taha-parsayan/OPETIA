@@ -39,7 +39,7 @@ Additionally, the log box within OPETIA prints the data processing stages for mo
 
 ### 1. Download OPETIA
 
-1. Install **Conda** from the official website: [https://docs.conda.io/en/latest/miniconda.html](https://docs.conda.io/en/latest/miniconda.html)
+1. Install **Conda** from the official website: [ANACONDA](https://www.anaconda.com/download)
    (Choose Miniconda for your OS: Windows, macOS, or Linux.)
 2. Open a terminal and run:
 
@@ -54,21 +54,16 @@ cd OPETIA
 
 #### All Platforms (Windows / macOS / Linux)
 
-1. **Create the Conda environment**:
+1. **Create the Conda environment (only on time)**:
 
 ```bash
 conda env create -f environment.yml
 ```
 
-2. **Activate the environment**:
+2. **Run OPETIA**:
 
 ```bash
 conda activate opetia
-```
-
-3. **Run OPETIA**:
-
-```bash
 python OPETIA.py
 ```
 
