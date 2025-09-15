@@ -41,7 +41,15 @@ Additionally, the log box within OPETIA prints the data processing stages for mo
 
 1. Install **Conda** from the official website: [ANACONDA](https://www.anaconda.com/download)
    (Choose Miniconda for your OS: Windows, macOS, or Linux.)
-2. Open a terminal and run:
+2. Open a terminal (macOS and Linux) or Anaconda Prompt (Windows) and run:
+
+```bash
+conda --version 
+```
+
+To make sure Conda is installed successfully.
+
+Then get OPETIA by running:
 
 ```bash
 git clone https://github.com/taha-parsayan/OPETIA.git
