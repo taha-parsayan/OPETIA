@@ -1,0 +1,8 @@
+numpy
+pandas
+matplotlib
+nibabel
+customtkinter
+antspyx
+antspynet
+scipy
