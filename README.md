@@ -8,8 +8,7 @@
 
 ### OPETIA documentations
 
-Detailed documentations and tutorial can be found at:
-
+Detailed documentations and tutorial can be found at: 
 [OPETIA docs](https://opetia-docs.readthedocs.io/en/latest/index.html#)
 
 ### Introduction
