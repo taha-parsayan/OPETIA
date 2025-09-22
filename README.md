@@ -6,6 +6,11 @@
 ![Static Badge](https://img.shields.io/badge/FSL-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/PET%20/%20MRI-4CAF50)
 
+### OPETIA documentations
+
+Detailed documentations and tutorial can be found at:
+
+[OPETIA docs](https://opetia-docs.readthedocs.io/en/latest/index.html#)
 
 ### Introduction
 OPETIA is a user-friendly PET/MRI (Positron Emission Tomography / Magnetic Resonance Imaging) image analysis software, developed using Python for accurate brain image quantification.
@@ -84,4 +89,5 @@ python OPETIA.py
 
 ## Citation
 Please cite the following paper:
-https://www.sciencedirect.com/science/article/pii/S1053811925002812
+
+[PETIA publication](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
