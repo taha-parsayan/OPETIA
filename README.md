@@ -7,7 +7,7 @@
 
 # OPETIA (Odense-Oxford PET Image Analysis)
 
-### [OPETIA publication](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
+### [Publication in NeuroImage journal](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
 
 
 ### OPETIA documentations
