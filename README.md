@@ -5,9 +5,9 @@
 ![Static Badge](https://img.shields.io/badge/FSL-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/PET%20/%20MRI-4CAF50)
 
-### OPETIA (Odense-Oxford PET Image Analysis)
+# OPETIA (Odense-Oxford PET Image Analysis)
 
-[OPETIA publication](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
+### [OPETIA publication](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
 
 
 ### OPETIA documentations
