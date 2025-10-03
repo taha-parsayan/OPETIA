@@ -8,9 +8,7 @@
 # OPETIA (Odense-Oxford PET Image Analysis)
 
 ---
-
-[PETIA publication](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
-
+[OPETIA publication](https://www.sciencedirect.com/science/article/pii/S1053811925002812)
 ---
 
 ### OPETIA documentations
