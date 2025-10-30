@@ -61,7 +61,7 @@ Check if Conda is installed correctly by running the following command in your t
 conda --version
 ```
 
-2. **Install git
+2. **Install git**
 
 In the terminal (macOS/Ubuntu) or Anaconda Prompt (Windows), run the following command to install git:
 
