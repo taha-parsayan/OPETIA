@@ -45,38 +45,51 @@ Additionally, the log box within OPETIA prints the data processing stages for mo
 
 ## How to Use OPETIA
 
-### 1. Download OPETIA
+OPETIA can be installed on macOS/Windows/Ubuntu systems using the following steps:
 
-1. Install **Conda** from the official website: [ANACONDA](https://www.anaconda.com/download)
-   (Choose Miniconda for your OS: Windows, macOS, or Linux.)
-2. Open a terminal (macOS and Linux) or Anaconda Prompt (Windows) and run:
+1. **Install Conda**
+
+You can install Conda from the official website:
+
+[Conda Installation Guide](https://www.anaconda.com/download)
+
+(Choose Miniconda for your OS: Windows, macOS, or Linux.)
+
+Check if Conda is installed correctly by running the following command in your terminal (macos/Ubuntu) or Anaconda Prompt (Windows):
 
 ```bash
-conda --version 
+conda --version
 ```
 
-To make sure Conda is installed successfully.
+2. **Install git
 
-Then get OPETIA by running:
+In the terminal (macOS/Ubuntu) or Anaconda Prompt (Windows), run the following command to install git:
+
+```bash
+conda install -c anaconda git
+git --version
+```
+
+3. **Download OPETIA**
+
+You can download OPETIA from its GitHub repository by running the following command in the terminal or Anaconda Prompt:
 
 ```bash
 git clone https://github.com/taha-parsayan/OPETIA.git
 cd OPETIA
 ```
 
----
+4. **Install the packages**
 
-### 2. Create Conda Environment, Install Packages, and Run OPETIA
-
-#### All Platforms (Windows / macOS / Linux)
-
-1. **Create the Conda environment (only on time)**:
+Run the following command in your terminal or Anaconda Prompt to install the required packages:
 
 ```bash
 conda env create -f environment.yml
 ```
+      
+5. **Run OPETIA**
 
-2. **Run OPETIA**:
+Activate the OPETIA environment and start OPETIA by running the following commands:
 
 ```bash
 conda activate opetia
